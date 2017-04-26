@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>财务对账系统</title>
+    <link rel="shortcut icon"  href="/favicon.ico" type="image/x-icon">
+</head>
+<body>
+    <div id="indexPage">
+        <div class="header">
+            <div class="head-top">
+                <div class="lg-info">
+                    <span>欢迎您<b>admin</b></span>
+                    <span class="exit">退出</span>
+                </div>
+            </div>
+            <div class="head-bot">
+                <ul>
+                    <li class="yklogo"><span></span></li>
+                    <li class="tit">财务对账系统</li>
+                    <li id="uploadfile"><span onselectstart="return false;">上传账单</span></li>
+                </ul>
+            </div>
+        </div>
+        <div class="side-wrapper">
+            <div class="s-w-l">
+                <ul>
+                    <li onselectstart="return false;" class="tabofbill" :class="{active: billtabshow}" @click="billtabEvent">账单管理</li>
+                    <li onselectstart="return false;" class="tabofcheck" :class="{active: checktabshow}" @click="checktabEvent">对账管理</li>
+                </ul>
+            </div>
+            <div class="s-w-r">
+                <div class="searchCondition clearfix">
+                    <ul>
+                        <li class="s-time clearfix mr30 selectorWrap">
+                            <label>时间:</label>
+                            <selector extra-class="selectStya mr10" def-html="2017年" :def-val="byear" select-type="year" select-mean="byear" @chooseopt="handledata"></selector>
+                            <selector extra-class="selectStya" def-html="1月" def-val="01" select-type="month" select-mean="bmonth" @chooseopt="handledata"></selector>
+                            <span class="mr5 ml5">-</span>
+                            <selector extra-class="selectStya mr10" def-html="2017年" :def-val="eyear" select-type="year" select-mean="eyear" @chooseopt="handledata"></selector>
+                            <selector extra-class="selectStya" def-html="1月" def-val="01" select-type="month" select-mean="emonth" @chooseopt="handledata"></selector>
+                        </li>
+                        <!-- 账单状态 -->
+                        <li class="s-status clearfix selectorWrap" v-if="statushow">
+                            <label>账单状态:</label>
+                            <selector extra-class="selectStyc" def-html="全部" :def-val="billStatus" select-type="bStatu" select-mean="billStatus" @chooseopt="handledata"></selector>
+                        </li>
+                        <li class="s-status clearfix selectorWrap" v-else>
+                            <label>对账状态:</label>
+                             <selector extra-class="selectStyc" def-html="全部" :def-val="billStatus" select-type="cStatu" select-mean="billStatus" @chooseopt="handledata"></selector>
+                        </li>
+                        <li class="s-payway clearfix mr20 selectorWrap">
+                            <label>支付渠道:</label>
+                             <selector extra-class="selectStyc" def-html="全部" :def-val="channel" select-type="cNel" select-mean="channel" @chooseopt="handledata"></selector>
+                        </li>
+                        <li class="s-account clearfix">
+                            <label>支付账号:</label>
+                            <input type="text" name="account" v-model="accountName"  select-type="accountName"  @focus="combineEvent">
+                            <!--  <div class="combineResWrap">
+                                <p></p>
+                                <ul>
+                                    <li>123</li>
+                                    <li>123</li>
+                                    <li>123</li>
+                                </ul>
+                            </div> -->
+                        </li>
+                    </ul>
+                    <div class="searchBtn">
+                        <span onselectstart="return false;" @click="searchResult">查询</span>
+                    </div>
+                </div>
+                <div class="searchResult">
+                    <div  v-if="resOfshow == 'y'">
+                        <div class="overview">共找到<b>3</b>条信息</div>
+                        <table>
+                            <tr>
+                                <th>账单文件名</th>
+                                <th>支付渠道</th>
+                                <th>支付账号</th>
+                                <th>对账年月</th>
+                                <th>账单状态</th>
+                                <th>上传人</th>
+                                <th>上传时间</th>
+                                <th>操作</th>
+                            </tr>
+                            <tr class="nocheckitem" v-for="item in resList">
+                                <td class="w180 txtpos-l">{{item.accountName}}</td>
+                                <td class="w90">{{item.channel}}</td>
+                                <td class="w140 txtpos-l">{{item.accountName}}</td>
+                                <td class="w90">{{item.billTime}}</td>
+                                <td class="w90 hlight">{{item.billStatus}}</td>
+                                <td class="w90">{{item.operator}}</td>
+                                <td class="w160">{{item.filename}}</td>
+                                <td class="w150 operatecheck"><span>对账</span></td>
+                            </tr>
+                        </table>
+                    </div>
+                    <!-- 无结果 -->
+                    <div class="resOfnone" v-else-if="resOfshow == 'n'">
+                       <div class="bg"></div>
+                       <p>没有找到结果！</p> 
+                    </div>
+                </div>
+            </div>
+        </div>       
+    </div>
+</body>
+</html>
+
+
+

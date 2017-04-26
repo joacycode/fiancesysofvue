@@ -1,0 +1,335 @@
+/* main.less 
+ * Origin author xzhang & Licence to youku
+ * Create 2017-04-10 & Update 2017-04-10(xzhang)
+ */
+@import 'css3.less';
+@import 'reset.less';
+html,body{width: 100%;height: 100%;}
+#detailPage,#indexPage{width: 100%;height: 100%;}
+.ico-base(@width,@height,@posw,@posh){
+	width: @width;height: @height;background-image: url(../img/collect.png);background-repeat: no-repeat;background-position: @posw @posh;display: inline-block;
+}
+.bef-af-sty(@top,@left,@margintop){
+	content: '';
+	position: absolute;
+	top: @top;
+	left: @left;
+	margin-top: @margintop;
+}
+.elpsis(@width){
+	max-width: @width;white-space: nowrap;text-overflow: ellipsis;overflow: hidden;vertical-align: middle;
+}
+.w90{width: 90px;}
+.w140{width: 140px;}
+.w150{width: 150px;}
+.w160{width: 160px;}
+.w180{width: 180px;}
+.w300{width: 300px;}
+.mr5{margin-right: 5px;}
+.ml5{margin-left: 5px;}
+.mr10{margin-right: 10px;}
+.mr20{margin-right: 20px;}
+.mr30{margin-right: 30px;}
+.mt35{margin-top: 35px;}
+.clearfix{
+	&:before,&:after{
+		content: '';
+		display: block;
+		width: 100%;
+		height: 0;
+		clear: both;
+		visibility:hidden;
+		zoom: 1;
+	}
+}
+hr{opacity: 0.3;margin: 50px 0;}
+b{font-style: normal;font-weight: normal;}
+a{color: #30A4FF;}
+.txtpos-l{text-align: left!important;}
+// 账单管理
+.ico-bill{.ico-base(20px,21px,0,0);}
+.ico-billAct{.ico-base(20px,21px,-20px,0);}
+// 对账管理
+.ico-checkbill{.ico-base(20px,21px,-40px,0);}
+.ico-checkbillAct{.ico-base(20px,21px,-60px,0);}
+// 上传
+.ico-upload{.ico-base(20px,20px,-80px,-1px);}
+// 登录
+.ico-loginame{.ico-base(18px,20px,0,-21px);}
+.ico-loginpwd{.ico-base(18px,20px,-18px,-21px);}
+.ico-loginclo{.ico-base(14px,14px,-36px,-21px);}
+// 弹窗
+.ico-warn{.ico-base(35px,35px,0,-41px);}
+.ico-success{.ico-base(35px,35px,0,-111px);}
+.ico-notice{.ico-base(35px,35px,0,-76px);}
+
+// head
+.header{width: 100%;overflow: hidden;}
+.head-top{
+	width: 100%;height: 30px;background: #343F52;overflow: hidden;
+	.lg-info{
+		width: 1200px;margin: 0 auto;color: #fff;
+		span{float: right;}
+	 }
+}
+.head-bot{
+	width: 100%;background: #fff;overflow: hidden;
+	ul{
+		width: 1200px;height: 60px;margin: 0 auto;
+		li{float: left;height: 100%;line-height: 60px;}
+	}
+	li.yklogo{
+		width: 130px;padding-right: 30px;position: relative;box-sizing: content-box;
+		span{width: 130px;height: 25px;display: inline-block;background-image: url(../img/yk-logo.png);background-repeat: no-repeat;vertical-align: middle;}
+		&:after{
+			content: '';display: inline-block;
+			width: 1px;height: 20px;background: #D8D8D8;
+			position: absolute;right: 15px;top: 50%;margin-top: -10px;
+		}
+	}
+	li.tit{
+		font-size: 20px;color: #666;display: inline-block;
+	}
+}
+#uploadfile{
+	float: right;
+	span{
+		width: 120px;height: 35px;line-height: 35px;color: #30A4FF;border: 1px solid #30A4FF;border-radius: 2px;text-indent: 46px;display: inline-block;cursor: pointer;position: relative;
+		&:before{
+			.ico-upload;
+			.bef-af-sty(50%,10px,-10px);
+		}
+	}
+}
+// side
+.side-wrapper{
+	width: 1200px;margin: 20px auto 0 auto;
+	// side left
+	.s-w-l{
+		width: 150px;float: left;margin-right: 20px;
+		li{width: 100%;height: 45px;line-height: 45px;color:#30A4FF;background: #fff;margin-bottom: 15px;text-indent: 50px;cursor: pointer;border-radius: 2px;;position: relative;
+			&:before{
+				.bef-af-sty(50%,15px,-10.5px);
+			}
+		}
+		.tabofbill{
+			color: #30A4FF;background: #fff;
+			&:before{
+				.ico-bill;	
+			}
+			&.active{
+				color: #fff;background: #30A4FF;
+				&:before{
+					.ico-billAct;	
+				}	
+			}
+		}
+		.tabofcheck{
+			color: #30A4FF;background: #fff;
+			&:before{
+				.ico-checkbill;	
+			}
+			&.active{
+				color: #fff;background: #30A4FF;
+				&:before{
+					.ico-checkbillAct;	
+				}	
+			}
+		}
+	}
+	// side right
+	.s-w-r{
+		width: 1030px;padding:20px;padding-bottom:137px;background: #fff;float: left;
+		.searchCondition{
+			padding: 20px;background: #FAFAFA;border: 1px solid #E1E1E1;
+			& > ul{
+				width: 764px;float: left;margin-bottom: -15px;
+				& > li{
+					float: left;margin-bottom: 15px;line-height: 28px;
+					label{width: 62px;margin-right: 10px;float: left;}
+					select,input{height: 28px;line-height: 28px;border: 1px solid #ccc;border-radius: 2px;background: #fff;}
+					span{float: left;display: inline-block;} 
+				}
+			}
+			.s-account{
+				input{width: 388px;height: 26px;}
+			}
+			.searchBtn{
+				span{	
+					width: 82px;height: 28px;line-height: 28px;color: #666;text-align: center;cursor: pointer;display: inline-block;
+					background: #F5F5F5;
+					border: 1px solid #CCCCCC;
+					border-radius: 2px;
+					margin: 16px 0 0 64px;
+					&:hover{background: #eee;}
+				}
+			}
+		}
+		.searchResult{
+			overflow: hidden;margin-top: 20px;color: #666;
+			.overview{
+				b{color: #F26C4E;margin: 0 5px;}
+			}
+			table{
+				width: 990px;margin-top: 20px;border: 1px solid #E1E1E1;border-left: none;
+				tr:nth-child(odd){background: #FAFAFA}
+				td,th{text-align: center;border-left: 1px solid #E1E1E1;padding: 18px 9px;word-wrap:break-word;word-break:break-all;color: #666;}
+				th{border-bottom: 2px solid #E1E1E1;height: 45px;padding:0 9px;color: #333;font-weight: normal;}
+				.operatecheck span{border: 1px solid #30A4FF;border-radius: 2px;background: #fff;padding: 0px 6px;color: #30A4FF;cursor: pointer;display: inline-block;}
+				.operatecheck a{margin-right: 12px;}
+				.nocheckitem .hlight,.checkFail .hlight{color:#F26C4E;}
+				.checkSuc .hlight{color:#00C651;}
+				.hascheckitem .operatecheck span{display: none;}//已对账不显示
+				.checkConfirm .operatecheck{//已确认不显示
+					& a,& span{
+						display: none;	
+					}
+				}
+			}
+			.resOfnone{
+				padding: 130px 0;color: #999;font-size: 16px;
+				div{width: 80px;height: 82px;background-image: url(../img/result-none.png);background-repeat: no-repeat;background-position: center;background-size: cover;margin: 0 auto;position: relative;}
+				p{text-align: center;margin-top: 10px;}
+			}
+
+		}
+	}
+}
+//detial
+.detail-wrapper{
+	width: 1200px;margin: 20px auto 0 auto;overflow: hidden;padding: 20px 20px 250px 20px;background: #fff;
+	
+}
+
+// pop window
+.dialogWrap{
+	width: 450px;min-height: 225px;background: #FFFFFF;box-shadow: 0 0 5px 0 rgba(184,191,197,0.50);border-radius: 2px;text-align: center;padding-bottom: 40px;position: absolute;top: 50%;left:50%;margin-left: -225px;margin-top: -200px;
+	.toper{
+		width: 100%;height: 45px;line-height: 45px;background: rgba(244, 248, 250, 0.7);padding: 0 20px;position: relative;
+		.title{float: left;font-size: 16px;font-weight: 700;}
+		.close{.ico-loginclo;float: right;margin-top: 15px;cursor: pointer;}
+	}
+	.middler{
+		width: 90%;height: 135px;text-align: center;padding-top: 45px;font-size: 16px;font-weight: bold;margin:0 auto;
+		.ico{vertical-align: middle;}
+		&.success{
+			.ico{.ico-success;}
+		}
+		&.notice{
+			.ico{.ico-notice;}
+		}
+		&.warn{
+			.ico{.ico-warn;}
+		}
+		.signlWords{display: inline-block;.elpsis(360px);}
+		.multiWords{
+			display: inline-block;vertical-align: middle;overflow: hidden;text-align: left;
+			p{.elpsis(360px);}
+			p:first-child{margin-bottom: 8px;}
+			p:last-child{font-size: 12px;color: #666;font-weight: normal;}
+		}
+	}
+	.makeSure,.cancel{
+		display: inline-block;width: 125px;height: 35px;background: #30A4FF;border-radius: 2px;color: #fff;text-align: center;line-height: 35px;cursor: pointer;
+	}
+	.makeSure{
+		background: #30A4FF;color: #fff;
+		&:hover{background: #47adfd;}
+	}
+	.cancel{
+		background: #fafafa;border: 1px solid #DDDDDD;color: #666;
+		&:hover{background: #fafafe;}
+	}
+	.progressbar{
+		margin-top: 90px;color: #666;
+		p:first-child{margin-bottom: 10px;}
+		p.proTxt{margin-top: 10px;}
+		.probar{
+			width: 200px;height: 8px;border-radius: 100px;background: #ececec;margin: 0 auto;
+			span{display: block;background: #30A4FF;border-radius: 100px;width: 176px;height: 8px;}
+		}
+	}
+	.former{
+		color: #666;margin: 20px 30px -15px 30px;
+		.formitem{
+			margin-bottom: 15px;width: 100%;height: 35px;line-height: 35px;
+			span,input,.selector{float: left;height: 35px;line-height: 35px;}
+			.selector{
+				ul{top: 35px;}
+			}
+			span:first-child{margin-right: 10px;}	
+			input.ty_long{
+				width: 320px;background: #FFFFFF;border: 1px solid #DDDDDD;border-radius: 2px;
+			}
+			.selector{width: 150px;height: 35px;display: inline-block;vertical-align: middle;background: #eee;background: #fff;}
+		}
+	}
+	.manualSurer{
+		margin: 20px 20px 0 20px;
+		p{
+			span:first-child{float: left;}
+			.lastNum{
+				float: right;color: #666;b{margin: 0 2px;}
+				.first{color: #F26C4E;}
+			}
+		}
+		textarea{width: 100%;height: 120px;background: #FFFFFF;border: 1px solid #DDDDDD;margin-top: 15px;resize:none;padding:15px;color: #666;}
+	}
+}
+// detail page
+.detail-wrapper{
+	.infOfdetail{
+		li{float: left;color: #666;}
+	}
+	.tabOfdetail{
+		margin-top: 25px;
+		.tab_first{
+			position: relative;
+		}
+		.tab_first,.tab_second{
+			width: 200px;height: 44px;background: #FAFAFA;border: 1px solid #D8D8D8;float: left;line-height: 44px;text-align: center;color: #30A4FF;
+			&.active{
+				background: #fff;border-bottom-color: #fff;color: #333;font-weight: bold;
+			}
+		}
+		.tab_second{display: none;}
+		.tab_last{
+			margin-left: 200px;border-bottom: 1px solid #D8D8D8;height: 44px;
+			a{width: 145px;height: 35px;line-height: 35px;color: #30A4FF;text-align: center;border:1px solid #30A4FF;display: inline-block;float: right;}
+		}
+		&.hastwo{//对账详情、未核对订单
+			.tab_first:after{
+				content: '';
+				position: absolute;
+				right: -6px;
+				bottom: -1px;
+				width: 5px;
+				height: 1px;
+				background: #D8D8D8;
+			}
+			.tab_first,.tab_second{cursor: pointer;}
+			.tab_second{display: inline-block;}
+			.tab_last{
+				margin-left: 405px;
+			}
+		}
+	}
+	.resOfdetaill{
+		.overview{
+			margin: 25px 0;
+			span{float: right;b{color: #F26C4E;}}
+			.incomeNum{b{color: #00C651;}}
+		}
+		table{
+				width: 100%;border: 1px solid #E1E1E1;border-left: none;
+				tr:nth-child(odd){background: #FAFAFA}
+				td,th{text-align: center;border-left: 1px solid #E1E1E1;padding: 18px 9px;word-wrap:break-word;word-break:break-all;color: #666;}
+				th{border-bottom: 2px solid #E1E1E1;height: 45px;padding:0 9px;color: #333;font-weight: normal;}
+				.handleConf{
+					a{border:1px solid #30A4FF;border-radius: 2px;color: #30A4FF;text-align: center;padding:2px 10px;}
+				}
+			}	
+	}
+	#d-of-unch{display: none;}
+}
+
