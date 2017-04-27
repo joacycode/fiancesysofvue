@@ -336,4 +336,46 @@ a{color: #30A4FF;}
 	}
 	#d-of-unch{display: none;}
 }
-
+// login
+.loginMidWrap{
+	width: 100%;height: 78%;min-height: 600px;min-width: 1200px;background-image: url(../img/loginbg.jpg);background-repeat: no-repeat;background-position: center;background-size: cover;position: relative;
+	.loginFrame{
+		width: 350px;height: 360px;background:#fff;position: absolute;right: 50px;top: 50%;margin-top: -180px;border-radius: 8px;padding: 30px 25px 40px;
+		.loginError{width: 100%;height: 30px;line-height: 30px;font-size: 12px;color: #F26C4E;}
+		.formin{
+			width: 100%;margin-bottom: 25px;
+			input{width: 100%;height: 40px; line-height: 40px;border:1px solid #ccc;color: #999;font-size: 12px;padding: 0 10px 0 40px;}
+			&.account:before{
+				content: '';
+				display: block;
+				width: 20px;
+				height: 20px;
+				clear: both;
+				visibility:hidden;
+				zoom: 1;
+				.ico-loginame;
+				position: absolute;
+				left: 0;
+				top: 0;
+			}
+			&.password:before{
+				content: '';
+				display: block;
+				width: 20px;
+				height: 20px;
+				clear: both;
+				visibility:hidden;
+				zoom: 1;
+				.ico-loginpwd;
+				position: absolute;
+				left: 0;
+				top: 0;
+			}
+		}
+		.submitBtn{
+			width: 100%;margin-top: 25px;
+			span{background: #30A4FF;border-radius: 4px;width: 300px;height: 40px;line-height: 40px;text-align: center;display: block;color: #fff;cursor: default;margin-top: 90px;}
+		}
+	}
+}
+.loginFooter{width: 100%;text-align: center;color: #999;margin-top: 50px;}
