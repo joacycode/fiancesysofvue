@@ -18,7 +18,7 @@
                 <ul>
                     <li class="yklogo"><span></span></li>
                     <li class="tit">财务对账系统</li>
-                    <li id="uploadfile"><span onselectstart="return false;">上传账单</span></li>
+                    <li id="uploadfile"><span onselectstart="return false;" @click="uploadsth">上传账单</span></li>
                 </ul>
             </div>
         </div>
@@ -104,6 +104,7 @@
                 </div>
             </div>
         </div>       
+        <dialogpop v-if="isShowthis" :con-type="dialogType" :con-title="dialogTitle" :con-rank="dialogRank" :dialog-sub="hasDialogsub" @dialogclose="closeEvent" @uploadeventsure="toUploadEvent" @dialogeventsure="todialogevent" @handeventsure="tohandeventsure" @handeventcancel="tohandeventcancel"><p>{{dialogHtml}}</p><p v-if="hasDialogsub">{{dialogHtmlSub}}</p></dialogpop>
     </div>
 </body>
 </html>

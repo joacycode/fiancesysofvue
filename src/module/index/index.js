@@ -8,6 +8,7 @@ require('assets/less/main.less')
 // import 'assets/a.css'
 
 import Selector from '../../components/selector'
+import Dialogpop from '../../components/dialogpop'
 // Vue.use(VueRouter)
 
 // // 创建一个路由器实例
@@ -48,10 +49,18 @@ new Vue({
     billStatus: '-2',
     channel: '-2',
     accountName: '',
-    apiUrl: 'http://financial-checking.heyi.test/bill/selectBillInfoByPage'
+    apiUrl: 'http://financial-checking.heyi.test/bill/selectBillInfoByPage',
+    isShowthis: false,
+    dialogType: '', // dailog类型 dialogbar progressbar uploaddbar handlebar
+    dialogTitle: '', // 标题
+    dialogRank: '', // icon类型 notce success warn
+    hasDialogsub: false,  // 是否有sub文字
+    dialogHtml: '', // 文字
+    dialogHtmlSub: '' // sub文字
   },
   components: {
-    'selector': Selector
+    'selector': Selector,
+    'dialogpop': Dialogpop
   },
   methods: {
     getBilldata: function (params) {
@@ -135,6 +144,40 @@ new Vue({
     },
     combineEvent: function () {
       console.log('111123213123123123')
+    },
+    uploadsth: function () {
+      this.isShowthis = true
+      this.dialogType = 'uploaddbar'
+      this.dialogTitle = '上传账单'
+    },
+    closeEvent: function () {
+      this.isShowthis = false
+    },
+    toUploadEvent: function (params) {
+      $.ajax({
+        url: 'http://financial-checking.heyi.test/bill/addBill',
+        async: false,
+        type: 'get',
+        dataType: 'jsonp',
+        jsonp: 'jsoncallback',
+        jsonCallback: 'getData',
+        data: decodeURIComponent($.param(params))
+      })
+      .done((res) => {
+        console.log(res)
+      })
+      .fail((XHR, textStatus, errorThrown) => {
+        console.log(textStatus)
+      })
+    },
+    todialogevent: function () {
+      // this.isShowthis = true
+    },
+    tohandeventsure: function () {
+      // this.isShowthis = true
+    },
+    tohandeventcancel: function () {
+      // this.isShowthis = true
     }
   }
 })

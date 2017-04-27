@@ -1,5 +1,5 @@
 <template>
-  <div class="dialogMaskfix" v-if="dialogShow">
+  <div class="dialogMaskfix">
     <div class="dialogMaskbg">
       <div class="dialogWrap">
         <!-- dialogbar -->
@@ -11,11 +11,14 @@
             <!-- conRank: warn success notice -->
             <div class="middler" :class="conRank"> 
               <span class="ico"></span>
-              <div class="multiWords" v-if="dialogSub == 'true'">
-                <p>该月账单正在处理中，不允许重复操作</p>
-                <p>系统繁忙，请稍后再试。</p>
+              <div class="multiWords" v-if="dialogSub == true">
+                  <slot></slot>
               </div>
-              <p class="signlWords" v-else>该月账单正在处理中，不允许重复操作！</p>
+              <div class="signlWords" v-else>
+                <p>
+                  <slot></slot>
+                </p>
+              </div>
             </div>
             <span class="makeSure" @click="dialogEventsure">确认</span>
         </div>
@@ -34,24 +37,24 @@
           </div>
           <p class="proTxt">88%</p> -->
         </div>
-        <!-- uplaodbar -->
-        <div class="uplaodbar" v-else-if="conType == 'uplaodbar'">
+        <!-- uploaddbar -->
+        <div class="uploaddbar" v-else-if="conType == 'uploaddbar'">
           <div class="toper">
             <span class="title">{{conTitle}}</span>
             <span class="close"  @click="dialogClose"></span>
           </div>
           <div class="former">
             <div class="formitem">
-              <span>支付渠道</span><input type="text" class="ty_long">
+              <span>支付渠道</span><selector class="ty_long selector" def-html="全部" :def-val="channel" select-type="cNel" select-mean="channel" @chooseopt=""></selector>
             </div>
             <div class="formitem">
-              <span>支付账号</span><input type="text" class="ty_long">
+              <span>支付账号</span><input type="text" class="ty_long" v-model="uploadAccount" :class="{blanknull:isAccountNull}">
             </div>
             <div class="formitem selectorWrap">
-              <span>账单年月</span> <selector class="selector mr10 " def-html="2017年" :def-val="year" select-type="year"  @chooseopt=""></selector><selector class="selector" def-html="5月" :def-val="month" select-type="month"  @chooseopt=""></selector>
+              <span>账单年月</span> <selector class="selector mr10 " def-html="2017年" :def-val="year" select-type="year" select-mean="year" @chooseopt="handledata"></selector><selector class="selector" def-html="1月" :def-val="month" select-type="month" select-mean="month" @chooseopt="handledata"></selector>
             </div>
             <div class="formitem">
-              <span>账单地址</span><input type="text" class="ty_long">
+              <span>账单地址</span><input type="text" class="ty_long" v-model="uploadAdress" :class="{blanknull:isAdressNull}">
             </div>
           </div>  
           <span class="makeSure mt35" @click="uploadEvent">立即上传</span>
@@ -75,21 +78,28 @@
     </div>
   </div>
 </template>
+ <!-- <dialogpop con-type="handlebar"  con-title="标题" con-rank="warn" dialog-sub="true"></dialogpop> -->
 <script>
 // import VueResource from 'vue-resource'
 import Selector from './selector'
 export default {
+  components: {
+    Selector
+  },
   data () {
     return {
       msg: '213123123',
       typeNums: 50,
-      dialogShow: true
+      year: 2017,
+      month: '01',
+      channel: '-2',
+      uploadAccount: '',
+      uploadAdress: '',
+      isAdressNull: false,
+      isAccountNull: false
     }
   },
   props: ['conType', 'conTitle', 'conRank', 'dialogSub'],
-  components: {
-    Selector
-  },
   methods: {
     countEvent: function (e) {
       // console.log(e.target.value.length)
@@ -101,28 +111,58 @@ export default {
       }
     },
     dialogClose: function () {
-      this.dialogShow = false
+      this.$emit('dialogclose')
     },
     dialogEventsure: function () {
-      this.dialogShow = false
-      this.$emit('dialogClose')
+      this.$emit('dialogeventsure')
     },
     uploadEvent: function () {
-      this.dialogShow = false
-      this.$emit('uploadEvent')
+      if (this.uploadAccount === '') {
+        this.isAccountNull = true
+        return false
+      }
+      if (this.uploadAdress === '') {
+        this.isAdressNull = true
+        return false
+      }
+      this.isAccountNull = false
+      this.isAdressNull = false
+      let params = {
+        channel: Number(this.channel),
+        accountName: this.uploadAccount,
+        billTime: Number(this.year + this.month),
+        downloadUrl: this.uploadAdress
+      }
+      this.$emit('uploadeventsure', params)
     },
     handTypeEventsure: function () {
-      this.dialogShow = false
-      this.$emit('handTypeEventsure')
+      this.$emit('handeventsure')
     },
     handTypeEventcancel: function () {
-      this.dialogShow = false
-      this.$emit('handTypeEventcancel')
+      this.$emit('handeventcancel')
+    },
+    handledata: function (m, n) {
+      switch (m) {
+        case 'year':
+          this.year = n
+          break
+        case 'month':
+          this.month = n
+          break
+        case 'channel':
+          this.channel = n
+          break
+        default: return
+      }
     }
   }
 }
 </script>
 <style lang="less">
+.blanknull{
+  border-color: #ff5e5e!important;
+  box-shadow: 0 0 5px 0px #ff5e5e!important;
+}
 .dialogMaskfix{
   width: 100%;height: 100%;position: absolute;top: 0;left: 0;z-index: 999;
   .dialogMaskbg{

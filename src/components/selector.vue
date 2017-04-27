@@ -2,7 +2,7 @@
   <div class="selectPicker" :class="extraClass" :data-value="toShowval" :data-mean="selectMean">
     <span class="defaultVal" @click.stop="updowns" v-html="toShowhtml"></span>
     <ul>
-      <li v-for="item in selectOpts" :data-value="item.val" @click="chooseopt">{{item.txt}}</li>
+      <li v-for="item in selectOpts" :data-value="item.id" @click="chooseopt">{{item.name}}</li>
     </ul>
   </div>
 </template>
@@ -13,14 +13,9 @@ import $ from 'jquery'
 export default {
   data () {
     return {
-      months: [{val: '01', txt: '1月'}, {val: '02', txt: '2月'}, {val: '03', txt: '3月'}, {val: '04', txt: '4月'}, {val: '05', txt: '5月'}, {val: '06', txt: '6月'}, {val: '07', txt: '7月'}, {val: '08', txt: '8月'}, {val: '09', txt: '9月'}, {val: '10', txt: '10月'}, {val: '11', txt: '11月'}, {val: '12', txt: '12月'}],
-      years: [{val: 2016, txt: '2016年'}, {val: 2017, txt: '2017年'}, {val: 2018, txt: '2018年'}, {val: 2019, txt: '2019年'}],
-      billStus: [{val: -2, txt: '全部'}, {val: 2, txt: '对账通过'}, {val: 3, txt: '对账不通过'}, {val: 0, txt: '未对账'}],
-      checkStus: [{val: -2, txt: '全部'}, {val: 2, txt: '对账通过'}, {val: 3, txt: '对账不通过'}, {val: 4, txt: '已确认'}],
-      checkRes: [{val: 0, txt: '一致'}, {val: 1, txt: '不一致'}],
-      channel: '',
       toShowhtml: this.defHtml,
-      toShowval: this.defVal
+      toShowval: this.defVal,
+      channels: ''
     }
   },
   props: ['extraClass', 'defHtml', 'defVal', 'selectType', 'selectMean'],
@@ -28,21 +23,38 @@ export default {
     selectOpts: function () {
       switch (this.selectType) {
         case 'year':
-          return this.years
+          return [{id: 2016, name: '2016年'}, {id: 2017, name: '2017年'}, {id: 2018, name: '2018年'}, {id: 2019, name: '2019年'}]
         case 'month':
-          return this.months
+          return [{id: '01', name: '1月'}, {id: '02', name: '2月'}, {id: '03', name: '3月'}, {id: '04', name: '4月'}, {id: '05', name: '5月'}, {id: '06', name: '6月'}, {id: '07', name: '7月'}, {id: '08', name: '8月'}, {id: '09', name: '9月'}, {id: '10', name: '10月'}, {id: '11', name: '11月'}, {id: '12', name: '12月'}]
         case 'bStatu':
-          return this.billStus
+          return [{id: -2, name: '全部'}, {id: 2, name: '对账通过'}, {id: 3, name: '对账不通过'}, {id: 0, name: '未对账'}]
         case 'cStatu':
-          return this.checkStus
+          return [{id: -2, name: '全部'}, {id: 2, name: '对账通过'}, {id: 3, name: '对账不通过'}, {id: 4, name: '已确认'}]
         case 'checkRe':
-          return this.checkRes
+          return [{id: 0, name: '一致'}, {id: 1, name: '不一致'}]
         case 'cNel':
-          this.getcNel()
-          return this.channel
+          return this.channels
         default:
           return []
       }
+    }
+  },
+  mounted: function () {
+    if (this.selectType === 'cNel') {
+      $.ajax({
+        url: 'http://financial-checking.heyi.test/account/getAllAcount',
+        async: false,
+        type: 'get',
+        dataType: 'jsonp',
+        jsonp: 'jsoncallback',
+        jsonCallback: 'getData'
+      })
+      .done((res) => {
+        this.channels = res.data
+      })
+      .fail((XHR, textStatus, errorThrown) => {
+        console.log(textStatus)
+      })
     }
   },
   methods: {
@@ -88,21 +100,6 @@ export default {
       .removeClass('hashow')
       // 事件和参数发射出去
       this.$emit('chooseopt', this.selectMean, this.toShowval)
-    },
-    getcNel: function () {
-      $.ajax({
-        url: 'http://financial-checking.heyi.test/account/getAllAcount',
-        type: 'get',
-        dataType: 'jsonp',
-        jsonp: 'jsoncallback',
-        jsonpCallback: 'getData'
-      })
-      .done((res) => {
-        this.channel = res.message
-      })
-      .fail((XHR, textStatus, errorThrown) => {
-        console.log(textStatus)
-      })
     }
   }
 }
@@ -113,7 +110,7 @@ export default {
 // selectPicker
 .selectPicker{
   background: #fff;border:1px solid #ddd;border-radius: 2px;position: relative;cursor: default;height: 28px;line-height: 28px;display: inline-block;float: left;
-  .defaultVal{width: 100%;height: 100%;display: block;text-align: center;overflow: hidden;white-space: nowrap;padding: 0 30px 0 10px;position: relative;
+  .defaultVal{width: 100%;height: 100%;display: block;text-align: left;overflow: hidden;white-space: nowrap;padding: 0 30px 0 10px;position: relative;
      &:after{
       content: '';
       position: absolute;
@@ -130,7 +127,7 @@ export default {
   ul{
       min-width: 100%;max-height: 280px;list-style: none;position: absolute;top: 28px;left:0;background: #fff;padding:10px 0;box-shadow: 0 0 5px 0 rgba(184,191,197,0.50);z-index: 2;overflow-y: scroll;overflow-x: auto;white-space: nowrap;display: none;
     li{
-      text-align: center;padding:0 10px;float: none;line-height: 24px;
+      text-align: left;padding:0 10px;float: none;line-height: 24px;
       &:hover{
         background: #f4f8fa;
       }
