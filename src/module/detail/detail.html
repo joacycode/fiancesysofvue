@@ -10,40 +10,39 @@
     <div class="header">
         <div class="head-top">
             <div class="lg-info">
-                <span>欢迎您<b>admin</b></span>
                 <span class="exit">退出</span>
+                <span>欢迎您,<b>admin</b></span>
             </div>
         </div>
         <div class="head-bot">
             <ul>
                 <li class="yklogo"><span></span></li>
                 <li class="tit">财务对账系统</li>
-                <li id="uploadfile"><span onselectstart="return false;">上传账单</span></li>
             </ul>
         </div>
     </div>
     <div class="detail-wrapper">
       <ul class="infOfdetail clearfix">
         <li>对账信息：</li>
-        <li class="billPayway">支付宝</li>
+        <li class="billPayway"><p v-if="payChannel === '1'">支付宝</p><p v-else-if="payChannel === '2'">微信</p><p v-else-if="payChannel === '3'">财付通</p><p v-else>{{payChannel}}</p></li>
         <li>，</li>
-        <li class="billAccount">yfbcwg@youku.com</li>
+        <li class="billAccount">{{billAccount}}</li>
         <li>，</li>
-        <li class="billDate">2016-12</li>
+        <li class="billDate">{{billTime}}</li>
       </ul>
       <div class="tabOfdetail hastwo clearfix">
-        <div class="tab_first tablist active mr5">对账详情</div>
-        <div class="tab_second tablist">未核对订单</div>
+        <div class="tab_first tablist mr5" :class="{active: ischeckDetailTab}" @click="checkDetailTab">对账详情</div>
+        <div class="tab_second tablist" :class="{active: !ischeckDetailTab}" @click="uncheckedTab">未核对订单</div>
         <div class="tab_last">
-          <a href="#">导出全部不一致订单</a>
+          <a :href="exporturi" target="_blank">导出全部不一致订单</a>
         </div>
       </div>
       <div class="resOfdetaill">
-        <div id="d-of-ch">
+        <div v-show="ischeckDetailTab">
           <div class="overview clearfix">
-            <span class="handleCharge">手续费(元)：<b>-30</b></span>
-            <span class="extendNum mr20">支出总计(元)：<b>-100</b></span>
-            <span class="incomeNum mr20">收入总计(元)：<b>+20000</b></span>
+            <span class="handleCharge">手续费(元)：<b>-{{detialFee}}</b></span>
+            <span class="extendNum mr20">支出总计(元)：<b>-{{detialRefund}}</b></span>
+            <span class="incomeNum mr20">收入总计(元)：<b>+{{detialRevenue}}</b></span>
           </div>
           <table>
             <tr>
@@ -54,29 +53,21 @@
               <th class="w180">核对结果</th>
               <th class="w300">操作</th>
             </tr>
-            <tr>
-              <td>2017035800</td>
-              <td><b class="mr5">+</b>60</td>
-              <td><b class="mr5">-</b>0</td>
-              <td>在线支付</td>
-              <td>一致</td>
-              <td class="handleConf"><a href="#">手动确认</a></td>
-            </tr>
-            <tr>
-              <td>2017035800</td>
-              <td><b class="mr5">+</b>0</td>
-              <td><b class="mr5">-</b>20</td>
-              <td>在线支付</td>
-              <td>不一致</td>
-              <td class="txtpos-l">手动输入原因手动输入原因手动输入原因手动输入原因手动输入原因手动输入原因手动输入原因手动输入原因</td>
+            <tr v-for="item in billDetailList">
+              <td>{{item.payChargeSn}}</td>
+              <td><b class="mr5">+</b>{{item.revenue}}</td>
+              <td><b class="mr5">-</b>{{item.cost}}</td>
+              <td>{{item.type}}</td>
+              <td>{{item.verifyResult}}</td>
+              <td class="txtpos-l" v-if="!!item.verifyResult">{{item.reason}}</td>
+              <td class="handleConf" v-else><span>手动确认</span></td>
             </tr>
           </table>
         </div>
-        <div id="d-of-unch">
+        <div v-show="!ischeckDetailTab">
           <div class="overview clearfix">
-            <span class="handleCharge">手续费(元)：<b>-30</b></span>
-            <span class="extendNum mr20">支出总计(元)：<b>-100</b></span>
-            <span class="incomeNum mr20">收入总计(元)：<b>+20000</b></span>
+            <span class="extendNum mr20">支出总计(元)：<b>-{{uncheckedRefund}}</b></span>
+            <span class="incomeNum mr20">收入总计(元)：<b>+{{uncheckedRevenue}}</b></span>
           </div>
           <table>
             <tr>
@@ -87,28 +78,20 @@
               <th class="w180">核对结果</th>
               <th class="w300">操作</th>
             </tr>
-            <tr>
-              <td>2017035800</td>
-              <td><b class="mr5">+</b>10000</td>
-              <td><b class="mr5">-</b>0</td>
-              <td>在线支付</td>
-              <td>一致</td>
-              <td class="handleConf"><a href="#">手动确认</a></td>
-            </tr>
-            <tr>
-              <td>2017035800</td>
-              <td><b class="mr5">+</b>0</td>
-              <td><b class="mr5">-</b>223219</td>
-              <td>在线支付</td>
-              <td>不一致</td>
-              <td class="txtpos-l">未核对订单未核对订单未核对订单未核对订单未核对订单未核对订单</td>
+            <tr v-for="item in unCheckedList">
+              <td>{{item.payChargeSn}}</td>
+              <td><b class="mr5">+</b>{{item.revenue}}</td>
+              <td><b class="mr5">-</b>{{item.cost}}</td>
+              <td>{{item.type}}</td>
+              <td>{{item.verifyResult}}</td>
+              <td class="txtpos-l" v-if="!!item.verifyResult">{{item.reason}}</td>
+              <td class="handleConf" v-else><span>手动确认</span></td>
             </tr>
           </table>
         </div>
       </div>
-      
     </div>
-    <dialogpop con-type="handlebar"  con-title="标题" con-rank="warn" dialog-sub="true"></dialogpop>
+    <dialogpop v-if="isShowthis" :con-type="dialogType" :con-title="dialogTitle" :con-rank="dialogRank" :dialog-sub="hasDialogsub" @dialogclose="closeEvent"  @handeventsure="tohandeventsure"><p>{{dialogHtml}}</p><p v-if="hasDialogsub">{{dialogHtmlSub}}</dialogpop>
   </div>
 </body>
 </html>

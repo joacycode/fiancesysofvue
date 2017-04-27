@@ -20,7 +20,7 @@
                 </p>
               </div>
             </div>
-            <span class="makeSure" @click="dialogEventsure">确认</span>
+            <span class="makeSure" @click="dialogClose">确认</span>
         </div>
         <!-- dialogbar -->
         <div class="progressbar" v-else-if="conType == 'progressbar'">
@@ -78,7 +78,7 @@
     </div>
   </div>
 </template>
- <!-- <dialogpop con-type="handlebar"  con-title="标题" con-rank="warn" dialog-sub="true"></dialogpop> -->
+<!-- <dialogpop v-if="isShowthis" :con-type="dialogType" :con-title="dialogTitle" :con-rank="dialogRank" :dialog-sub="hasDialogsub" @dialogclose="closeEvent" @uploadeventsure="toUploadEvent" @handeventsure="tohandeventsure" @handeventcancel="tohandeventcancel"><p>{{dialogHtml}}</p><p v-if="hasDialogsub">{{dialogHtmlSub}}</p></dialogpop> -->
 <script>
 // import VueResource from 'vue-resource'
 import Selector from './selector'
@@ -113,9 +113,6 @@ export default {
     dialogClose: function () {
       this.$emit('dialogclose')
     },
-    dialogEventsure: function () {
-      this.$emit('dialogeventsure')
-    },
     uploadEvent: function () {
       if (this.uploadAccount === '') {
         this.isAccountNull = true
@@ -139,7 +136,7 @@ export default {
       this.$emit('handeventsure')
     },
     handTypeEventcancel: function () {
-      this.$emit('handeventcancel')
+      this.$emit('dialogclose')
     },
     handledata: function (m, n) {
       switch (m) {

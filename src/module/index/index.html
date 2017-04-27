@@ -10,8 +10,8 @@
         <div class="header">
             <div class="head-top">
                 <div class="lg-info">
-                    <span>欢迎您<b>admin</b></span>
                     <span class="exit">退出</span>
+                    <span>欢迎您,<b>admin</b></span>
                 </div>
             </div>
             <div class="head-bot">
@@ -25,8 +25,8 @@
         <div class="side-wrapper">
             <div class="s-w-l">
                 <ul>
-                    <li onselectstart="return false;" class="tabofbill" :class="{active: billtabshow}" @click="billtabEvent">账单管理</li>
-                    <li onselectstart="return false;" class="tabofcheck" :class="{active: checktabshow}" @click="checktabEvent">对账管理</li>
+                    <li onselectstart="return false;" class="tabofbill" :class="{active: isTabshow}" @click="billTabEvent">账单管理</li>
+                    <li onselectstart="return false;" class="tabofcheck" :class="{active: !isTabshow}" @click="checkTabEvent">对账管理</li>
                 </ul>
             </div>
             <div class="s-w-r">
@@ -41,15 +41,19 @@
                             <selector extra-class="selectStya" def-html="1月" def-val="01" select-type="month" select-mean="emonth" @chooseopt="handledata"></selector>
                         </li>
                         <!-- 账单状态 -->
-                        <li class="s-status clearfix selectorWrap" v-if="statushow">
+                        <li class="s-status clearfix selectorWrap" v-show="isTabshow">
                             <label>账单状态:</label>
                             <selector extra-class="selectStyc" def-html="全部" :def-val="billStatus" select-type="bStatu" select-mean="billStatus" @chooseopt="handledata"></selector>
                         </li>
-                        <li class="s-status clearfix selectorWrap" v-else>
+                        <li class="s-status clearfix selectorWrap" v-show="!isTabshow">
                             <label>对账状态:</label>
                              <selector extra-class="selectStyc" def-html="全部" :def-val="billStatus" select-type="cStatu" select-mean="billStatus" @chooseopt="handledata"></selector>
                         </li>
-                        <li class="s-payway clearfix mr20 selectorWrap">
+                        <li class="s-payway clearfix mr20 selectorWrap" v-show="isTabshow">
+                            <label>支付渠道:</label>
+                             <selector extra-class="selectStyc" def-html="全部" :def-val="channel" select-type="cNel" select-mean="channel" @chooseopt="handledata"></selector>
+                        </li>
+                        <li class="s-payway clearfix mr20 selectorWrap" v-show="!isTabshow">
                             <label>支付渠道:</label>
                              <selector extra-class="selectStyc" def-html="全部" :def-val="channel" select-type="cNel" select-mean="channel" @chooseopt="handledata"></selector>
                         </li>
@@ -66,12 +70,13 @@
                             </div> -->
                         </li>
                     </ul>
+
                     <div class="searchBtn">
-                        <span onselectstart="return false;" @click="searchResult">查询</span>
+                        <span onselectstart="return false;" @click="searchResultEvent">查询</span>
                     </div>
                 </div>
                 <div class="searchResult">
-                    <div  v-if="resOfshow == 'y'">
+                    <div  v-if="resultShow === 'bill' && billRequestdata">
                         <div class="overview">共找到<b>3</b>条信息</div>
                         <table>
                             <tr>
@@ -84,27 +89,52 @@
                                 <th>上传时间</th>
                                 <th>操作</th>
                             </tr>
-                            <tr class="nocheckitem" v-for="item in resList">
-                                <td class="w180 txtpos-l">{{item.accountName}}</td>
-                                <td class="w90">{{item.channel}}</td>
+                            <tr class="nocheckitem" v-for="item in resultListBill">
+                                <td class="w180 txtpos-l">{{item.downloadUrl}}</td>
+                                <td class="w90"><p v-if="item.channel === 1">支付宝</p><p v-else-if="item.channel === 2">微信</p><p v-else-if="item.channel === 3">财付通</p><p v-else>{{item.channel}}</p></td>
+                                <td class="w140 txtpos-l">{{item.accountName}}</td>
+                                <td class="w90">{{item.billTime}}</td>
+                                <td class="w90 hlight">{{item.billStatus}}</td>
+                                <td class="w90">{{item.operator}}</td>
+                                <td class="w160">{{item.gmtCreate}}</td>
+                                <td class="w150 operatecheck"><span @click="startCheckBtn(item.id)">对账</span></td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div  v-else-if="resultShow === 'check' && checkRequestdata">
+                        <div class="overview">共找到<b>3</b>条信息</div>
+                        <table>
+                            <tr>
+                                <th>账单文件名</th>
+                                <th>支付渠道</th>
+                                <th>支付账号</th>
+                                <th>对账年月</th>
+                                <th>对账状态</th>
+                                <th>上传人</th>
+                                <th>上传时间</th>
+                                <th>操作</th>
+                            </tr>
+                            <tr class="nocheckitem" v-for="item in resultListCheck">
+                                <td class="w180 txtpos-l"><p v-if="item.channel === 1">支付宝_{{item.accountName}}_{{item.billTime}}</p><p v-else-if="item.channel === 2">微信_{{item.accountName}}_{{item.billTime}}</p><p v-else-if="item.channel === 3">财付通_{{item.accountName}}_{{item.billTime}}</p><p v-else>{{item.channel}}_{{item.accountName}}_{{item.billTime}}</p></td>
+                                <td class="w90"><p v-if="item.channel === 1">支付宝</p><p v-else-if="item.channel === 2">微信</p><p v-else-if="item.channel === 3">财付通</p><p v-else>{{item.channel}}</p></td>
                                 <td class="w140 txtpos-l">{{item.accountName}}</td>
                                 <td class="w90">{{item.billTime}}</td>
                                 <td class="w90 hlight">{{item.billStatus}}</td>
                                 <td class="w90">{{item.operator}}</td>
                                 <td class="w160">{{item.filename}}</td>
-                                <td class="w150 operatecheck"><span>对账</span></td>
+                                <td class="w150 operatecheck"><a :href="'/module/detail.html?id=' + item.id + '&' + item.channel + '&' + item.accountName + '&' + item.billTime" target="_blank">详情</a><span @click="confirmCheckBtn(item.id)">确认对账</span></td>
                             </tr>
                         </table>
                     </div>
                     <!-- 无结果 -->
-                    <div class="resOfnone" v-else-if="resOfshow == 'n'">
+                    <div class="resOfnone" v-else-if="resultShow === 'nores'">
                        <div class="bg"></div>
                        <p>没有找到结果！</p> 
                     </div>
                 </div>
             </div>
         </div>       
-        <dialogpop v-if="isShowthis" :con-type="dialogType" :con-title="dialogTitle" :con-rank="dialogRank" :dialog-sub="hasDialogsub" @dialogclose="closeEvent" @uploadeventsure="toUploadEvent" @dialogeventsure="todialogevent" @handeventsure="tohandeventsure" @handeventcancel="tohandeventcancel"><p>{{dialogHtml}}</p><p v-if="hasDialogsub">{{dialogHtmlSub}}</p></dialogpop>
+        <dialogpop v-if="isShowthis" :con-type="dialogType" :con-title="dialogTitle" :con-rank="dialogRank" :dialog-sub="hasDialogsub" @dialogclose="closeEvent" @uploadeventsure="toUploadEvent"><p>{{dialogHtml}}</p><p v-if="hasDialogsub">{{dialogHtmlSub}}</p></dialogpop>
     </div>
 </body>
 </html>

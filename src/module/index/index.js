@@ -1,46 +1,22 @@
 import Vue from 'vue'
 import $ from 'jquery'
 require('assets/less/main.less')
-// import VueRouter from 'vue-router'
-// import Add from './add'
-// import List from './list'
-
-// import 'assets/a.css'
 
 import Selector from '../../components/selector'
 import Dialogpop from '../../components/dialogpop'
-// Vue.use(VueRouter)
 
-// // 创建一个路由器实例
-// // 并且配置路由规则
-// const router = new VueRouter({
-//   mode: 'history',
-//   // base: baseUrl,
-//   routes: [
-//     {
-//       path: '/add',
-//       component: Add
-//     },
-//     {
-//       path: '/list',
-//       component: List
-//     }
-//   ]
-// })
-// 现在我们可以启动应用了！
-// 路由器会创建一个 App 实例，并且挂载到选择符 #index 匹配的元素上。
 /* eslint-disable no-new */
 new Vue({
-  // router: router,
   el: '#indexPage',
   data: {
     total: 0,
     payAccount: '',
-    billOflist: [],
-    checkOflist: [],
-    resOfshow: '',
-    billtabshow: true,
-    checktabshow: false,
+    resultListBill: [],
+    resultListCheck: [],
+    resultShow: '',
+    billRequestdata: false,
+    checkRequestdata: false,
+    isTabshow: true,
     statushow: true,
     byear: '2017',
     bmonth: '01',
@@ -49,7 +25,6 @@ new Vue({
     billStatus: '-2',
     channel: '-2',
     accountName: '',
-    apiUrl: 'http://financial-checking.heyi.test/bill/selectBillInfoByPage',
     isShowthis: false,
     dialogType: '', // dailog类型 dialogbar progressbar uploaddbar handlebar
     dialogTitle: '', // 标题
@@ -65,7 +40,7 @@ new Vue({
   methods: {
     getBilldata: function (params) {
       $.ajax({
-        url: this.apiUrl,
+        url: 'http://financial-checking.heyi.test/bill/selectBillInfoByPage',
         type: 'GET',
         dataType: 'jsonp',
         jsonp: 'jsoncallback',
@@ -73,37 +48,42 @@ new Vue({
         data: decodeURIComponent($.param(params))
       })
       .done((res) => {
-        if (res.success && res.data.totalCount !== 0) {
-          this.billOflist = res.data.dataList
-          this.resOfshow = 'y'
-          // console.log(res.data.dataList)
+        if (res.code === 0) {
+          if (this.isTabshow) {
+            this.resultShow = 'bill'
+            this.billRequestdata = true
+            this.resultListBill = res.data.dataList
+          } else {
+            this.resultShow = 'check'
+            this.checkRequestdata = true
+            this.resultListCheck = res.data.dataList
+          }
+          // console.log('ssssss')
         } else {
-          this.resOfshow = 'n'
+          this.resultShow = 'nores'
         }
       })
       .fail(() => {
         console.log('请求数据失败！')
       })
     },
-    billtabEvent: function () {
+    billTabEvent: function () {
       $(document)
       .find('.selectPicker .defaultVal')
       .removeClass('hashow')
       .siblings('ul')
       .slideUp('fast')
-      this.billtabshow = true
-      this.checktabshow = false
-      this.statushow = true
+      this.isTabshow = true
+      this.resultShow = 'bill'
     },
-    checktabEvent: function () {
+    checkTabEvent: function () {
       $(document)
       .find('.selectPicker .defaultVal')
       .removeClass('hashow')
       .siblings('ul')
       .slideUp('fast')
-      this.billtabshow = false
-      this.checktabshow = true
-      this.statushow = false
+      this.isTabshow = false
+      this.resultShow = 'check'
     },
     handledata: function (m, n) { // 触发组件传来的事件处理[自定义事件]
       switch (m) {
@@ -131,8 +111,7 @@ new Vue({
         default: return
       }
     },
-    searchResult: function () {
-      // console.log(this.billStatus, this.byear, this.bmonth, this.eyear, this.emonth, this.channel)
+    searchResultEvent: function () {
       this.getBilldata({
         billStatus: this.billStatus,
         startTime: Number(this.byear + this.bmonth),
@@ -143,7 +122,7 @@ new Vue({
       })
     },
     combineEvent: function () {
-      console.log('111123213123123123')
+      // console.log('111123213123123123')
     },
     uploadsth: function () {
       this.isShowthis = true
@@ -152,6 +131,7 @@ new Vue({
     },
     closeEvent: function () {
       this.isShowthis = false
+      // window.location.href = window.location.href
     },
     toUploadEvent: function (params) {
       $.ajax({
@@ -164,20 +144,55 @@ new Vue({
         data: decodeURIComponent($.param(params))
       })
       .done((res) => {
-        console.log(res)
+        this.dialogType = 'dialogbar'
+        if (res.code && res.code < 0) {
+          this.dialogType = 'dialogbar'
+          this.dialogRank = 'notice'
+          this.dialogHtml = res.message
+        } else if (res.code && res.code === 0) {
+          // this.dialogType = 'progressbar'
+          this.dialogType = 'dialogbar'
+          this.dialogRank = 'success'
+          this.dialogHtml = '上传成功'
+        }
       })
       .fail((XHR, textStatus, errorThrown) => {
         console.log(textStatus)
       })
     },
-    todialogevent: function () {
-      // this.isShowthis = true
+    startCheckBtn: function (id) {
+      this.checkBtnRequst({apiurl: 'http://financial-checking.heyi.test/bill/startCheck?id=', apiid: id})
     },
-    tohandeventsure: function () {
-      // this.isShowthis = true
+    confirmCheckBtn: function (id) {
+      this.checkBtnRequst({apiurl: 'http://financial-checking.heyi.test/statement/confirm?id=', apiid: id})
     },
-    tohandeventcancel: function () {
-      // this.isShowthis = true
+    checkBtnRequst: function (params) {
+      $.ajax({
+        url: params.apiurl + params.apiid,
+        type: 'GET',
+        dataType: 'jsonp',
+        jsonp: 'jsoncallback',
+        jsonpCallback: 'getData'
+      })
+      .done((res) => {
+        if (res.code === 0) {
+          this.isShowthis = true
+          this.dialogType = 'dialogbar'
+          this.dialogRank = 'success'
+          this.dialogHtml = res.message || '操作成功'
+        } else {
+          this.isShowthis = true
+          this.dialogType = 'dialogbar'
+          this.dialogRank = 'notice'
+          this.dialogHtml = res.message
+        }
+      })
+      .fail(() => {
+        console.log('请求数据失败！')
+      })
+    },
+    skipTodetail: function (id) {
+      window.location.href = '/module/detail.html?id=' + id
     }
   }
 })
