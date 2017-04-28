@@ -5,9 +5,16 @@ require('assets/less/main.less')
 
 import Selector from '../../components/selector'
 import Dialogpop from '../../components/dialogpop'
-
+import store from '../../assets/js/store/index'
+import Pagination from '../../components/pagination'
 /* eslint-disable no-new */
 new Vue({
+  store,
+  components: {
+    'selector': Selector,
+    'dialogpop': Dialogpop,
+    'pagination': Pagination
+  },
   el: '#indexPage',
   data: {
     total: 0,
@@ -34,11 +41,10 @@ new Vue({
     dialogHtml: '', // 文字
     dialogHtmlSub: '', // sub文字
     canlgout: true,
-    loginName: Cookie.get('loginSure')
-  },
-  components: {
-    'selector': Selector,
-    'dialogpop': Dialogpop
+    loginName: Cookie.get('loginSure'),
+    billTotal: 0,
+    checkTotal: 0,
+    pageSize: 10
   },
   methods: {
     getBilldata: function (params) {
@@ -56,12 +62,13 @@ new Vue({
             this.resultShow = 'bill'
             this.billRequestdata = true
             this.resultListBill = res.data.dataList
+            this.billTotal = res.data.totalCount
           } else {
             this.resultShow = 'check'
             this.checkRequestdata = true
             this.resultListCheck = res.data.dataList
+            this.checkTotal = res.data.totalCount
           }
-          // console.log('ssssss')
         } else {
           this.resultShow = 'nores'
         }
@@ -121,7 +128,8 @@ new Vue({
         endTime: Number(this.eyear + this.emonth),
         channel: this.channel,
         accountName: this.accountName,
-        pageNo: 1
+        pageNo: 1,
+        pageSize: this.pageSize
       })
     },
     combineEvent: function () {
@@ -192,6 +200,17 @@ new Vue({
       })
       .fail(() => {
         console.log('请求数据失败！')
+      })
+    },
+    getNewPageEvent: function (current) {
+      this.getBilldata({
+        billStatus: this.billStatus,
+        startTime: Number(this.byear + this.bmonth),
+        endTime: Number(this.eyear + this.emonth),
+        channel: this.channel,
+        accountName: this.accountName,
+        pageNo: current,
+        pageSize: this.pageSize
       })
     },
     logoutReq: function () {

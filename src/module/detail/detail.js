@@ -5,6 +5,7 @@ require('assets/less/main.less')
 
 import Dialogpop from '../../components/dialogpop'
 
+let _this
 /* eslint-disable no-new */
 new Vue({
 // router: router,
@@ -23,6 +24,7 @@ new Vue({
     detialFee: '',
     uncheckedRevenue: '',
     uncheckedRefund: '',
+    uncheckedFee: '',
     dialogType: 'handlebar', // dailog类型 dialogbar progressbar uploaddbar handlebar
     dialogTitle: '手动确认订单', // 标题
     dialogRank: '', // icon类型 notce success warn
@@ -42,30 +44,74 @@ new Vue({
   mounted: function () {
     let ref = window.location.search
     let arr = ref.split('&')
+    _this = this
     this.billid = arr[0].substring(ref.indexOf('?') + 4)
     this.payChannel = arr[1]
     this.billAccount = arr[2]
     this.billTime = arr[3].substring(0, 4) + '-' + arr[3].substring(4)
-    this.billDetailReq()
-    this.unCheckedReq()
-    this.billDetailOverView()
-    this.unCheckedOverView()
+    this.commonFormReq({ // detail bill
+      apiurl: 'http://financial-checking.heyi.test/statement/detailInfo?billId=',
+      datas: '',
+      callbackFun (res) {
+        if (res.code === 0) {
+          _this.billDetailList = res.data.dataList
+          console.log('对账详情:' + res.data)
+        }
+      }
+    })
+    this.commonFormReq({ // detial uncheck
+      apiurl: 'http://financial-checking.heyi.test/statement/uncheckInfo?billId=',
+      datas: '',
+      callbackFun (res) {
+        if (res.code === 0) {
+          _this.unCheckedList = res.data.dataList
+          console.log(res.code, res.data.dataList)
+          console.log('未核对订单:' + res.data)
+        }
+      }
+    })
+    // this.commonFormReq({ // detail bill overview
+    //   apiurl: 'http://financial-checking.heyi.test/statement/detailInfoStatistics?id=',
+    //   datas: '',
+    //   callbackFun (res) {
+    //     console.log(res.code)
+    //     if (res.code === 0) {
+    //       console.log('对账数据', res.data, res.data.refund, res.data.fee)
+    //       _this.detialRevenue = res.data.revenue
+    //       _this.detialRefund = res.data.refund
+    //       _this.detialFee = res.data.fee
+    //     }
+    //   }
+    // })
+    this.commonFormReq({ // detial uncheck overview
+      apiurl: 'http://financial-checking.heyi.test/statement/uncheckInfoStatistics?billId=',
+      datas: '',
+      callbackFun (res) {
+        console.log(res.code)
+        if (res.code === 0) {
+          console.log('未核对数据', res, res.data.refund, res.data.fee)
+          _this.uncheckedRevenue = res.data.revenue
+          _this.uncheckedRefund = res.data.refund
+          _this.uncheckedFee = res.data.fee
+        }
+      }
+    })
   },
   methods: {
-    billDetailReq: function () {
-      this.commonFormReq('http://financial-checking.heyi.test/statement/detailInfo?billId=', 'billDetail')
-    },
-    unCheckedReq: function () {
-      this.commonFormReq('http://financial-checking.heyi.test/statement/uncheckInfo?billId=', 'unChecked')
-    },
-    billDetailOverView: function () {
-      this.commonFormReq('http://financial-checking.heyi.test/statement/detailInfoStatistics?billId=', 'bdOverview')
-    },
-    unCheckedOverView: function () {
-      this.commonFormReq('http://financial-checking.heyi.test/statement/uncheckInfoStatistics?billId=', 'ucOverview')
-    },
     tohandeventsure: function () {
-      this.commonFormReq('http://financial-checking.heyi.test/statement/uncheckConfirm?id=', 'handConfirm')
+      this.commonFormReq({ // detial uncheck overview
+        apiurl: 'http://financial-checking.heyi.test/statement/uncheckConfirm?id=',
+        datas: '',
+        callbackFun (res) {
+          if (res.code === 0) {
+            window.location.href = window.location.href
+          } else {
+            this.dialogType = 'dialogbar'
+            this.dialogRank = 'notice'
+            this.dialogHtml = res.message || '手动确认有误'
+          }
+        }
+      })
     },
     closeEvent: function () {
       this.isShowthis = false
@@ -75,56 +121,27 @@ new Vue({
       this.isShowthis = true
       this.dialogType = 'handlebar'
     },
-    commonFormReq: function (apiurl, ref, params) {
+    commonFormReq: function (params) {
       $.ajax({
-        url: apiurl + this.billid,
+        url: params.apiurl + this.billid,
         type: 'GET',
         dataType: 'jsonp',
         jsonp: 'jsoncallback',
         jsonpCallback: 'getData',
-        data: params ? decodeURIComponent($.param(params)) : ''
+        data: params.datas ? decodeURIComponent($.param(params.datas)) : ''
       })
       .done((res) => {
-        if (res.code === 0) {
-          switch (ref) {
-            case 'billDetail':
-              this.billDetailList = res.data.dataList
-              console.log('billDetail')
-              break
-            case 'unChecked':
-              this.unCheckedList = res.data.dataList
-              console.log('unChecked')
-              break
-            case 'bdOverview':
-              console.log('bdOverview')
-              break
-            case 'ucOverview':
-              console.log('ucOverview')
-              break
-            case 'handConfirm':
-              window.location.href = window.location.href
-              break
-            default: return
-          }
-        } else {
-          if (ref === 'handConfirm') {
-            this.dialogType = 'dialogbar'
-            this.dialogRank = 'notice'
-            this.dialogHtml = res.message || '手动确认有误'
-          }
-        }
+        params.callbackFun(res)
       })
-      .fail(() => {
-        console.log('请求数据失败！')
+      .fail((Xhr, txt) => {
+        console.log('请求数据失败！', txt)
       })
     },
     checkDetailTab: function () {
       this.ischeckDetailTab = true
-      console.log('ccccc')
     },
     uncheckedTab: function () {
       this.ischeckDetailTab = false
-      console.log('uuuu')
     },
     logoutReq: function () {
       if (this.canlgout) {

@@ -70,14 +70,13 @@
                             </div> -->
                         </li>
                     </ul>
-
                     <div class="searchBtn">
                         <span onselectstart="return false;" @click="searchResultEvent">查询</span>
                     </div>
                 </div>
                 <div class="searchResult">
                     <div  v-if="resultShow === 'bill' && billRequestdata">
-                        <div class="overview">共找到<b>3</b>条信息</div>
+                        <div class="overview">共找到<b>{{billTotal}}</b>条信息</div>
                         <table>
                             <tr>
                                 <th>账单文件名</th>
@@ -100,9 +99,10 @@
                                 <td class="w150 operatecheck"><span @click="startCheckBtn(item.id)">对账</span></td>
                             </tr>
                         </table>
+                        <pagination v-if="billTotal > 0" @getnewpage="getNewPageEvent" :total-items="billTotal" :page-size="pageSize"></pagination>
                     </div>
                     <div  v-else-if="resultShow === 'check' && checkRequestdata">
-                        <div class="overview">共找到<b>3</b>条信息</div>
+                        <div class="overview">共找到<b>{{checkTotal}}</b>条信息</div>
                         <table>
                             <tr>
                                 <th>账单文件名</th>
@@ -125,6 +125,7 @@
                                 <td class="w150 operatecheck"><a :href="'/module/detail.html?id=' + item.id + '&' + item.channel + '&' + item.accountName + '&' + item.billTime" target="_blank">详情</a><span @click="confirmCheckBtn(item.id)">确认对账</span></td>
                             </tr>
                         </table>
+                        <pagination v-if="checkTotal > 0" @getnewpage="getNewPageEvent" :total-items="checkTotal" :page-size="pageSize"></pagination>
                     </div>
                     <!-- 无结果 -->
                     <div class="resOfnone" v-else-if="resultShow === 'nores'">
