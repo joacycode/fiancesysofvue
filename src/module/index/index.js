@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import $ from 'jquery'
+import Cookie from 'js-cookie'
 require('assets/less/main.less')
 
 import Selector from '../../components/selector'
@@ -31,7 +32,9 @@ new Vue({
     dialogRank: '', // icon类型 notce success warn
     hasDialogsub: false,  // 是否有sub文字
     dialogHtml: '', // 文字
-    dialogHtmlSub: '' // sub文字
+    dialogHtmlSub: '', // sub文字
+    canlgout: true,
+    loginName: Cookie.get('loginSure')
   },
   components: {
     'selector': Selector,
@@ -191,8 +194,26 @@ new Vue({
         console.log('请求数据失败！')
       })
     },
-    skipTodetail: function (id) {
-      window.location.href = '/module/detail.html?id=' + id
+    logoutReq: function () {
+      if (this.canlgout) {
+        this.canlgout = false
+        $.ajax({
+          url: 'http://financial-checking.heyi.test/user/logout',
+          type: 'GET',
+          dataType: 'jsonp',
+          jsonp: 'jsoncallback',
+          jsonpCallback: 'getData'
+        })
+        .done((res) => {
+          this.canlgout = true
+          Cookie.remove('loginSure')
+          window.location.href = window.location.href
+        })
+        .fail(() => {
+          this.canlgout = true
+          console.log('请求数据失败！')
+        })
+      }
     }
   }
 })

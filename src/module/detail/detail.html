@@ -10,8 +10,8 @@
     <div class="header">
         <div class="head-top">
             <div class="lg-info">
-                <span class="exit">退出</span>
-                <span>欢迎您,<b>admin</b></span>
+                <span class="exit" @click="logoutReq">退出</span>
+                <span>欢迎您,<b>{{loginName}}</b></span>
             </div>
         </div>
         <div class="head-bot">

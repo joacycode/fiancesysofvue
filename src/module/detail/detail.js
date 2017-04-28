@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import $ from 'jquery'
+import Cookie from 'js-cookie'
 require('assets/less/main.less')
 
 import Dialogpop from '../../components/dialogpop'
@@ -27,7 +28,8 @@ new Vue({
     dialogRank: '', // icon类型 notce success warn
     hasDialogsub: false,  // 是否有sub文字
     dialogHtml: '', // 文字
-    dialogHtmlSub: '' // sub文字
+    dialogHtmlSub: '', // sub文字
+    loginName: Cookie.get('loginSure')
   },
   computed: {
     exporturi: function () {
@@ -123,6 +125,27 @@ new Vue({
     uncheckedTab: function () {
       this.ischeckDetailTab = false
       console.log('uuuu')
+    },
+    logoutReq: function () {
+      if (this.canlgout) {
+        this.canlgout = false
+        $.ajax({
+          url: 'http://financial-checking.heyi.test/user/logout',
+          type: 'GET',
+          dataType: 'jsonp',
+          jsonp: 'jsoncallback',
+          jsonpCallback: 'getData'
+        })
+        .done((res) => {
+          this.canlgout = true
+          Cookie.remove('loginSure')
+          window.location.href = window.location.href
+        })
+        .fail(() => {
+          this.canlgout = true
+          console.log('请求数据失败！')
+        })
+      }
     }
   }
 })
