@@ -147,7 +147,6 @@ new Vue({
     toUploadEvent: function (params) {
       $.ajax({
         url: 'http://financial-checking.heyi.test/bill/addBill',
-        async: false,
         type: 'get',
         dataType: 'jsonp',
         jsonp: 'jsoncallback',
@@ -156,11 +155,11 @@ new Vue({
       })
       .done((res) => {
         this.dialogType = 'dialogbar'
-        if (res.code && res.code < 0) {
+        if (res.code !== 0) {
           this.dialogType = 'dialogbar'
           this.dialogRank = 'notice'
           this.dialogHtml = res.message
-        } else if (res.code && res.code === 0) {
+        } else {
           // this.dialogType = 'progressbar'
           this.dialogType = 'dialogbar'
           this.dialogRank = 'success'

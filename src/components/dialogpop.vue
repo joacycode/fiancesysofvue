@@ -45,7 +45,7 @@
           </div>
           <div class="former">
             <div class="formitem">
-              <span>支付渠道</span><selector class="ty_long selector" def-html="全部" :def-val="channel" select-type="cNel" select-mean="channel" @chooseopt=""></selector>
+              <span>支付渠道</span><selector class="ty_long selector" def-html="支付宝" :def-val="channel" select-type="cNel" select-mean="channel" @chooseopt="handledata"></selector>
             </div>
             <div class="formitem">
               <span>支付账号</span><input type="text" class="ty_long" v-model="uploadAccount" :class="{blanknull:isAccountNull}">
@@ -92,7 +92,7 @@ export default {
       typeNums: 50,
       year: 2017,
       month: '01',
-      channel: '-2',
+      channel: '1',
       uploadAccount: '',
       uploadAdress: '',
       isAdressNull: false,
@@ -139,6 +139,7 @@ export default {
       this.$emit('dialogclose')
     },
     handledata: function (m, n) {
+      console.log(m, n)
       switch (m) {
         case 'year':
           this.year = n
@@ -148,6 +149,7 @@ export default {
           break
         case 'channel':
           this.channel = n
+          console.log(this.channel)
           break
         default: return
       }

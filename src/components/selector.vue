@@ -43,13 +43,17 @@ export default {
     if (this.selectType === 'cNel') {
       $.ajax({
         url: 'http://financial-checking.heyi.test/account/getAllAcount',
-        async: false,
         type: 'get',
         dataType: 'jsonp',
         jsonp: 'jsoncallback',
         jsonCallback: 'getData'
       })
       .done((res) => {
+        let all = []
+        for (let item of res.data) {
+          all = all.concat(item.accountList)
+        }
+        res.data.splice(0, 0, {id: -2, name: '全部', accountList: all})
         this.channels = res.data
       })
       .fail((XHR, textStatus, errorThrown) => {

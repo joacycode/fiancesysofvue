@@ -30,7 +30,7 @@
         <li>，</li>
         <li class="billDate">{{billTime}}</li>
       </ul>
-      <div class="tabOfdetail hastwo clearfix">
+      <div class="tabOfdetail clearfix" :class="{hastwo: hasUncheckTab}">
         <div class="tab_first tablist mr5" :class="{active: ischeckDetailTab}" @click="checkDetailTab">对账详情</div>
         <div class="tab_second tablist" :class="{active: !ischeckDetailTab}" @click="uncheckedTab">未核对订单</div>
         <div class="tab_last">
@@ -63,7 +63,7 @@
               <td class="handleConf" v-else><span>手动确认</span></td>
             </tr>
           </table>
-          <!-- <pagination v-if="checkTotal > 0" @getnewpage="getNewPageEvent" :total-items="checkTotal" :page-size="pageSize"></pagination> -->
+          <pagination v-if="detailTotal > 0" @getnewpage="getBillNewPage" :total-items="detailTotal" :page-size="pageSize"></pagination>
         </div>
         <div v-show="!ischeckDetailTab">
           <div class="overview clearfix">
@@ -89,7 +89,7 @@
               <td class="handleConf" v-else><span>手动确认</span></td>
             </tr>
           </table>
-          <!-- <pagination v-if="checkTotal > 0" @getnewpage="getNewPageEvent" :total-items="checkTotal" :page-size="pageSize"></pagination> -->
+          <pagination v-if="uncheckTotal > 0" @getnewpage="getUncheckNewPage" :total-items="uncheckTotal" :page-size="pageSize"></pagination>
         </div>
       </div>
     </div>

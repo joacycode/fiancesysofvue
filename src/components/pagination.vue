@@ -15,7 +15,7 @@
   export default{
     data () {
       return {
-        somePage: '',
+        somePage: '1',
         inputError: false
       }
     },
@@ -57,18 +57,21 @@
       pageOffset (i) {
         if (i === 0 || i === this.currentPage) return
         this.$store.commit('GO_PAGE', (i - 1) * this.pageSize)
+        this.somePage = this.currentPage
         this.$emit('getnewpage', this.currentPage)
       },
       goPrePage () {
         this.$store.commit('PRE_PAGE', this.pageSize)
+        this.somePage = this.currentPage
         this.$emit('getnewpage', this.currentPage)
       },
       goNextPage () {
         this.$store.commit('NEXT_PAGE', this.pageSize)
+        this.somePage = this.currentPage
         this.$emit('getnewpage', this.currentPage)
       },
       goSomePage () {
-        if (this.somePage !== 'NAN' && this.somePage > 0) {
+        if (this.somePage !== 'NAN' && this.somePage > 0 && this.somePage <= this.totalPage) {
           this.pageOffset(this.somePage)
         } else {
           this.inputError = true

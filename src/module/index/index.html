@@ -49,6 +49,7 @@
                             <label>对账状态:</label>
                              <selector extra-class="selectStyc" def-html="全部" :def-val="billStatus" select-type="cStatu" select-mean="billStatus" @chooseopt="handledata"></selector>
                         </li>
+                        <!-- 支付渠道 -->
                         <li class="s-payway clearfix mr20 selectorWrap" v-show="isTabshow">
                             <label>支付渠道:</label>
                              <selector extra-class="selectStyc" def-html="全部" :def-val="channel" select-type="cNel" select-mean="channel" @chooseopt="handledata"></selector>
@@ -89,7 +90,7 @@
                                 <th>操作</th>
                             </tr>
                             <tr class="nocheckitem" v-for="item in resultListBill">
-                                <td class="w180 txtpos-l">{{item.downloadUrl}}</td>
+                                <td class="w180 txtpos-l"><p v-if="item.channel === 1">支付宝_{{item.accountName}}_{{item.billTime}}</p><p v-else-if="item.channel === 2">微信_{{item.accountName}}_{{item.billTime}}</p><p v-else-if="item.channel === 3">财付通_{{item.accountName}}_{{item.billTime}}</p><p v-else>{{item.channel}}_{{item.accountName}}_{{item.billTime}}</p></td>
                                 <td class="w90"><p v-if="item.channel === 1">支付宝</p><p v-else-if="item.channel === 2">微信</p><p v-else-if="item.channel === 3">财付通</p><p v-else>{{item.channel}}</p></td>
                                 <td class="w140 txtpos-l">{{item.accountName}}</td>
                                 <td class="w90">{{item.billTime}}</td>
@@ -121,7 +122,7 @@
                                 <td class="w90">{{item.billTime}}</td>
                                 <td class="w90 hlight">{{item.billStatus}}</td>
                                 <td class="w90">{{item.operator}}</td>
-                                <td class="w160">{{item.filename}}</td>
+                                <td class="w160">{{item.gmtCreate}}</td>
                                 <td class="w150 operatecheck"><a :href="'/module/detail.html?id=' + item.id + '&' + item.channel + '&' + item.accountName + '&' + item.billTime" target="_blank">详情</a><span @click="confirmCheckBtn(item.id)">确认对账</span></td>
                             </tr>
                         </table>
