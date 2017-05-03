@@ -57,7 +57,7 @@
                 </div>
             </div>
             <div class="formitem selectorWrap">
-              <span>账单年月</span> <selector class="selector mr10 " def-html="2017年" :def-val="year" select-type="year" select-mean="year" @chooseopt="handledata"></selector><selector class="selector" def-html="1月" :def-val="month" select-type="month" select-mean="month" @chooseopt="handledata"></selector>
+              <span>账单年月</span> <selector class="selector mr10 " def-html="2017年" :def-val="year" select-type="tyYear" select-mean="year" @chooseopt="handledata"></selector><selector class="selector" def-html="1月" :def-val="month" select-type="tyMonth" select-mean="month" @chooseopt="handledata"></selector>
             </div>
             <div class="formitem">
               <span>账单地址</span><input type="text" class="ty_long" v-model="uploadAdress" :class="{blanknull:isAdressNull}">

@@ -34,7 +34,7 @@ export default {
     selectOpts: function () {
       switch (this.selectType) {
         case 'tyYear':
-          return [{id: 2016, name: '2016年'}, {id: 2017, name: '2017年'}, {id: 2018, name: '2018年'}, {id: 2019, name: '2019年'}]
+          return [{id: 2017, name: '2017年'}, {id: 2018, name: '2018年'}, {id: 2019, name: '2019年'}]
         case 'tyMonth':
           return [{id: '01', name: '1月'}, {id: '02', name: '2月'}, {id: '03', name: '3月'}, {id: '04', name: '4月'}, {id: '05', name: '5月'}, {id: '06', name: '6月'}, {id: '07', name: '7月'}, {id: '08', name: '8月'}, {id: '09', name: '9月'}, {id: '10', name: '10月'}, {id: '11', name: '11月'}, {id: '12', name: '12月'}]
         case 'tyBillStatus':
