@@ -63,17 +63,17 @@ new Vue({
     this.detialUncheckOverview()
   },
   methods: {
-    tohandeventsure: function () {
+    tohandeventsure: function (val) {
       this.commonFormReq({ // detial uncheck overview
         apiurl: 'http://financial-checking.heyi.test/statement/uncheckConfirm?id=',
-        datas: '',
+        datas: {reason: val},
         callbackFun (res) {
           if (res.code === 0) {
             window.location.href = window.location.href
           } else {
-            this.dialogType = 'dialogbar'
-            this.dialogRank = 'notice'
-            this.dialogHtml = res.message || '手动确认有误'
+            _this.dialogType = 'dialogbar'
+            _this.dialogRank = 'notice'
+            _this.dialogHtml = res.message || '手动确认有误'
           }
         }
       })
@@ -144,7 +144,7 @@ new Vue({
         dataType: 'jsonp',
         jsonp: 'jsoncallback',
         jsonpCallback: params.diffcallback,
-        data: params.datas ? decodeURIComponent($.param(params.datas)) : ''
+        data: params.datas ? $.param(params.datas) : ''
       })
       .done((res) => {
         params.callbackFun(res)

@@ -8,6 +8,7 @@ import Dialogpop from '../../components/dialogpop'
 import store from '../../assets/js/store/index'
 import Pagination from '../../components/pagination'
 /* eslint-disable no-new */
+
 new Vue({
   store,
   components: {
@@ -21,9 +22,10 @@ new Vue({
     payAccount: '',
     resultListBill: [],
     resultListCheck: [],
-    resultShow: '',
-    billRequestdata: false,
-    checkRequestdata: false,
+    billHasdata: false,
+    checkHasdata: false,
+    billSearchNull: false,
+    checkSearchNull: false,
     isTabshow: true,
     statushow: true,
     byear: '2017',
@@ -44,58 +46,104 @@ new Vue({
     loginName: Cookie.get('loginSure'),
     billTotal: 0,
     checkTotal: 0,
-    pageSize: 10
+    pageSize: 10,
+    combinelist: [],
+    allListArray: [],
+    isCombineShow: false
+  },
+  computed: {
+    newResultListBill () {
+      return this.transformData(this.resultListBill)
+    },
+    newresultListCheck () {
+      return this.transformData(this.resultListCheck)
+    },
+    isListNull () {
+      return !this.combinelist.length
+    },
+    saveBillCondition () {
+      return {byear: '', bmonth: '', eyear: '', emonth: '', billStatus: '', channel: '', accountName: '', combinelist: ''}
+    },
+    saveCheckCondition () {
+      return {byear: '2017', bmonth: '01', eyear: '2017', emonth: '01', billStatus: '-2', channel: '-2', accountName: '', combinelist: this.allListArray[0]}
+    }
   },
   methods: {
-    getBilldata: function (params) {
-      $.ajax({
-        url: 'http://financial-checking.heyi.test/bill/selectBillInfoByPage',
-        type: 'GET',
-        dataType: 'jsonp',
-        jsonp: 'jsoncallback',
-        jsonpCallback: 'getData',
-        data: decodeURIComponent($.param(params))
-      })
-      .done((res) => {
-        if (res.code === 0) {
-          if (this.isTabshow) {
-            this.resultShow = 'bill'
-            this.billRequestdata = true
-            this.resultListBill = res.data.dataList
-            this.billTotal = res.data.totalCount
-          } else {
-            this.resultShow = 'check'
-            this.checkRequestdata = true
-            this.resultListCheck = res.data.dataList
-            this.checkTotal = res.data.totalCount
-          }
-        } else {
-          this.resultShow = 'nores'
-        }
-      })
-      .fail(() => {
-        console.log('请求数据失败！')
+    searchResultEvent () { // 账单和对账表查询
+      this.getBilldata({
+        billStatus: this.billStatus,
+        startTime: Number(this.byear + this.bmonth),
+        endTime: Number(this.eyear + this.emonth),
+        channel: this.channel,
+        accountName: this.accountName,
+        pageNo: 1,
+        pageSize: this.pageSize
       })
     },
-    billTabEvent: function () {
-      $(document)
-      .find('.selectPicker .defaultVal')
-      .removeClass('hashow')
-      .siblings('ul')
-      .slideUp('fast')
-      this.isTabshow = true
-      this.resultShow = 'bill'
+    billTabEvent () { // 账单tab
+      if (!this.isTabshow) {
+        $(document)
+        .find('.selectPicker .defaultVal')
+        .removeClass('hashow')
+        .siblings('ul')
+        .slideUp('fast')
+        this.isTabshow = true
+        this.saveCheckCondition['byear'] = this.byear
+        this.saveCheckCondition['bmonth'] = this.bmonth
+        this.saveCheckCondition['eyear'] = this.eyear
+        this.saveCheckCondition['emonth'] = this.emonth
+        this.saveCheckCondition['billStatus'] = this.billStatus
+        this.saveCheckCondition['channel'] = this.channel
+        this.saveCheckCondition['accountName'] = this.accountName
+        this.saveCheckCondition['combinelist'] = this.combinelist
+        this.byear = this.saveBillCondition['byear']
+        this.bmonth = this.saveBillCondition['bmonth']
+        this.eyear = this.saveBillCondition['eyear']
+        this.emonth = this.saveBillCondition['emonth']
+        this.billStatus = this.saveBillCondition['billStatus']
+        this.channel = this.saveBillCondition['channel']
+        this.accountName = this.saveBillCondition['accountName']
+        this.combinelist = this.saveBillCondition['combinelist']
+      }
     },
-    checkTabEvent: function () {
-      $(document)
-      .find('.selectPicker .defaultVal')
-      .removeClass('hashow')
-      .siblings('ul')
-      .slideUp('fast')
-      this.isTabshow = false
-      this.resultShow = 'check'
+    checkTabEvent () { // 对账tab
+      if (this.isTabshow) {
+        $(document)
+        .find('.selectPicker .defaultVal')
+        .removeClass('hashow')
+        .siblings('ul')
+        .slideUp('fast')
+        this.isTabshow = false
+        this.saveBillCondition['byear'] = this.byear
+        this.saveBillCondition['bmonth'] = this.bmonth
+        this.saveBillCondition['eyear'] = this.eyear
+        this.saveBillCondition['emonth'] = this.emonth
+        this.saveBillCondition['billStatus'] = this.billStatus
+        this.saveBillCondition['channel'] = this.channel
+        this.saveBillCondition['accountName'] = this.accountName
+        this.saveBillCondition['combinelist'] = this.combinelist
+        this.byear = this.saveCheckCondition['byear']
+        this.bmonth = this.saveCheckCondition['bmonth']
+        this.eyear = this.saveCheckCondition['eyear']
+        this.emonth = this.saveCheckCondition['emonth']
+        this.billStatus = this.saveCheckCondition['billStatus']
+        this.channel = this.saveCheckCondition['channel']
+        this.accountName = this.saveCheckCondition['accountName']
+        this.combinelist = this.saveCheckCondition['combinelist']
+      }
     },
-    handledata: function (m, n) { // 触发组件传来的事件处理[自定义事件]
+    getNewPageEvent (current) { // 分页页面请求
+      this.getBilldata({
+        billStatus: this.billStatus,
+        startTime: Number(this.byear + this.bmonth),
+        endTime: Number(this.eyear + this.emonth),
+        channel: this.channel,
+        accountName: this.accountName,
+        pageNo: current,
+        pageSize: this.pageSize
+      })
+    },
+    handledata (m, n) { // 根据被触发的组件含义对应处理[自定义事件]
       switch (m) {
         case 'byear':
           this.byear = n
@@ -114,6 +162,16 @@ new Vue({
           break
         case 'channel':
           this.channel = n
+          this.accountName = ''
+          if (n === '1') {
+            this.combinelist = this.allListArray[1]
+          } else if (n === '2') {
+            this.combinelist = this.allListArray[2]
+          } else if (n === '3') {
+            this.combinelist = this.allListArray[3]
+          } else {
+            this.combinelist = this.allListArray[0]
+          }
           break
         case 'accountName':
           this.accountName = n
@@ -121,37 +179,29 @@ new Vue({
         default: return
       }
     },
-    searchResultEvent: function () {
-      this.getBilldata({
-        billStatus: this.billStatus,
-        startTime: Number(this.byear + this.bmonth),
-        endTime: Number(this.eyear + this.emonth),
-        channel: this.channel,
-        accountName: this.accountName,
-        pageNo: 1,
-        pageSize: this.pageSize
-      })
+    combineFocus () {
+      this.isCombineShow = true
     },
-    combineEvent: function () {
-      // console.log('111123213123123123')
+    combineBlur () {
+      this.isCombineShow = false
     },
-    uploadsth: function () {
+    uploadsth () {
       this.isShowthis = true
       this.dialogType = 'uploaddbar'
       this.dialogTitle = '上传账单'
     },
-    closeEvent: function () {
+    closeEvent () { // dialog关闭事件
       this.isShowthis = false
       // window.location.href = window.location.href
     },
-    toUploadEvent: function (params) {
+    toUploadEvent (params) { // 上传确认
       $.ajax({
         url: 'http://financial-checking.heyi.test/bill/addBill',
         type: 'get',
         dataType: 'jsonp',
         jsonp: 'jsoncallback',
         jsonCallback: 'getData',
-        data: decodeURIComponent($.param(params))
+        data: $.param(params)
       })
       .done((res) => {
         this.dialogType = 'dialogbar'
@@ -170,13 +220,55 @@ new Vue({
         console.log(textStatus)
       })
     },
-    startCheckBtn: function (id) {
+    startCheckBtn (id) { // 开始对账
       this.checkBtnRequst({apiurl: 'http://financial-checking.heyi.test/bill/startCheck?id=', apiid: id})
     },
-    confirmCheckBtn: function (id) {
+    confirmCheckBtn (id) { // 确认对账
       this.checkBtnRequst({apiurl: 'http://financial-checking.heyi.test/statement/confirm?id=', apiid: id})
     },
-    checkBtnRequst: function (params) {
+    getBilldata (params) { // 获取账单和对账表方法
+      $.ajax({
+        url: 'http://financial-checking.heyi.test/bill/selectBillInfoByPage',
+        type: 'GET',
+        dataType: 'jsonp',
+        jsonp: 'jsoncallback',
+        jsonpCallback: 'getData',
+        data: $.param(params)
+      })
+      .done((res) => {
+        if (res.code === 0) {
+          if (this.isTabshow) {
+            this.billHasdata = true
+            this.billSearchNull = false
+            this.resultListBill = res.data.dataList
+            this.billTotal = res.data.totalCount
+          } else {
+            this.checkHasdata = true
+            this.checkSearchNull = false
+            this.resultListCheck = res.data.dataList
+            this.checkTotal = res.data.totalCount
+          }
+        } else {
+          if (this.isTabshow) {
+            this.billHasdata = false
+            this.billSearchNull = true
+          } else {
+            this.checkHasdata = false
+            this.checkSearchNull = true
+          }
+        }
+      })
+      .fail(() => {
+        console.log('请求数据失败！')
+      })
+    },
+    transformData (datalist) { // 数据转换方法
+      for (let item of datalist) {
+        item['unixtime'] = this.unixTimeto(item.gmtCreate)
+      }
+      return datalist
+    },
+    checkBtnRequst (params) { // 对账api
       $.ajax({
         url: params.apiurl + params.apiid,
         type: 'GET',
@@ -201,18 +293,24 @@ new Vue({
         console.log('请求数据失败！')
       })
     },
-    getNewPageEvent: function (current) {
-      this.getBilldata({
-        billStatus: this.billStatus,
-        startTime: Number(this.byear + this.bmonth),
-        endTime: Number(this.eyear + this.emonth),
-        channel: this.channel,
-        accountName: this.accountName,
-        pageNo: current,
-        pageSize: this.pageSize
-      })
+    unixTimeto (t) { // unix时间转换YYYY-MM-DD HH:MM:SS
+      let date = new Date(t)
+      let Y = date.getFullYear() + '-'
+      let M = (date.getMonth() + 1 < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1) + '-'
+      let D = (date.getDate() < 10 ? '0' + date.getDate() : date.getDate()) + ' '
+      let h = (date.getHours() < 10 ? '0' + date.getHours() : date.getHours()) + ':'
+      let m = (date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()) + ':'
+      let s = date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds()
+      return Y + M + D + h + m + s
     },
-    logoutReq: function () {
+    combineItemEvent (e) { // 联想数据选择事件
+      this.accountName = e.target.innerHTML
+    },
+    receiveListEvent (arraylist) { // 接受联想数据
+      this.allListArray = arraylist
+      this.combinelist = this.allListArray[0]
+    },
+    logoutReq () { // 登出
       if (this.canlgout) {
         this.canlgout = false
         $.ajax({

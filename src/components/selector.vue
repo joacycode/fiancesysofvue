@@ -15,24 +15,35 @@ export default {
     return {
       toShowhtml: this.defHtml,
       toShowval: this.defVal,
-      channels: ''
+      channels: '',
+      allListArray: []
     }
   },
-  props: ['extraClass', 'defHtml', 'defVal', 'selectType', 'selectMean'],
+  props: {
+    extraClass: String,
+    defHtml: [String, Number],
+    defVal: [String, Number],
+    selectType: [String, Number],
+    selectMean: [String, Number],
+    needTotal: {
+      type: String,
+      default: 'no'
+    }
+  },
   computed: {
     selectOpts: function () {
       switch (this.selectType) {
-        case 'year':
+        case 'tyYear':
           return [{id: 2016, name: '2016年'}, {id: 2017, name: '2017年'}, {id: 2018, name: '2018年'}, {id: 2019, name: '2019年'}]
-        case 'month':
+        case 'tyMonth':
           return [{id: '01', name: '1月'}, {id: '02', name: '2月'}, {id: '03', name: '3月'}, {id: '04', name: '4月'}, {id: '05', name: '5月'}, {id: '06', name: '6月'}, {id: '07', name: '7月'}, {id: '08', name: '8月'}, {id: '09', name: '9月'}, {id: '10', name: '10月'}, {id: '11', name: '11月'}, {id: '12', name: '12月'}]
-        case 'bStatu':
-          return [{id: -2, name: '全部'}, {id: 2, name: '对账通过'}, {id: 3, name: '对账不通过'}, {id: 0, name: '未对账'}]
-        case 'cStatu':
-          return [{id: -2, name: '全部'}, {id: 2, name: '对账通过'}, {id: 3, name: '对账不通过'}, {id: 4, name: '已确认'}]
-        case 'checkRe':
+        case 'tyBillStatus':
+          return [{id: -2, name: '全部'}, {id: 2, name: '对账通过'}, {id: 3, name: '对账不通过'}, {id: 0, name: '未对账'}, {id: 4, name: '已确认'}]
+        case 'tyCheckStatus':
+          return [{id: -2, name: '全部'}, {id: 2, name: '对账通过'}, {id: 3, name: '对账不通过'}, {id: 0, name: '未对账'}, {id: 4, name: '已确认'}]
+        case 'tyVerify':
           return [{id: 0, name: '一致'}, {id: 1, name: '不一致'}]
-        case 'cNel':
+        case 'tyChannel':
           return this.channels
         default:
           return []
@@ -40,7 +51,7 @@ export default {
     }
   },
   mounted: function () {
-    if (this.selectType === 'cNel') {
+    if (this.selectType === 'tyChannel') {
       $.ajax({
         url: 'http://financial-checking.heyi.test/account/getAllAcount',
         type: 'get',
@@ -49,16 +60,25 @@ export default {
         jsonCallback: 'getData'
       })
       .done((res) => {
-        let all = []
+        let list = []
         for (let item of res.data) {
-          all = all.concat(item.accountList)
+          list = list.concat(item.accountList) // 全部
+          this.allListArray.push(item.accountList)
         }
-        res.data.splice(0, 0, {id: -2, name: '全部', accountList: all})
+        if (this.needTotal === 'yes') {
+          res.data.splice(0, 0, {id: -2, name: '全部', accountList: list})
+          this.allListArray.unshift(list) // 全部数组形式的accountlist
+        }
         this.channels = res.data
       })
       .fail((XHR, textStatus, errorThrown) => {
         console.log(textStatus)
       })
+    }
+  },
+  watch: {
+    allListArray: function () {
+      this.$emit('sendlists', this.allListArray)
     }
   },
   methods: {

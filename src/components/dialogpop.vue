@@ -45,10 +45,16 @@
           </div>
           <div class="former">
             <div class="formitem">
-              <span>支付渠道</span><selector class="ty_long selector" def-html="支付宝" :def-val="channel" select-type="cNel" select-mean="channel" @chooseopt="handledata"></selector>
+              <span>支付渠道</span><selector class="ty_long selector" def-html="支付宝" :def-val="channel" select-type="tyChannel" select-mean="channel" @chooseopt="handledata"></selector>
             </div>
             <div class="formitem">
-              <span>支付账号</span><input type="text" class="ty_long" v-model="uploadAccount" :class="{blanknull:isAccountNull}">
+              <span>支付账号</span><input type="text" class="ty_long" v-model="uploadAccount" :class="{blanknull:isAccountNull}" @focus="combineFocus" @blur="combineBlur">
+               <div class="combineResWrap" v-show="isCombineShow">
+                    <p v-if="isListNull">未找到匹配结果</p>
+                    <ul v-else>
+                        <li v-for="item in combinelist" @mousedown="combineItemEvent">{{item}}</li>
+                    </ul>
+                </div>
             </div>
             <div class="formitem selectorWrap">
               <span>账单年月</span> <selector class="selector mr10 " def-html="2017年" :def-val="year" select-type="year" select-mean="year" @chooseopt="handledata"></selector><selector class="selector" def-html="1月" :def-val="month" select-type="month" select-mean="month" @chooseopt="handledata"></selector>
@@ -67,7 +73,7 @@
           </div>
           <div class="manualSurer">
             <p><span>原因:</span><span class="lastNum">还剩<b class="first">{{typeNums}}</b>/<b class="second">50</b>字</span></p>
-            <textarea placeholder="必填" @keyup="countEvent" @input="countEvent"></textarea>
+            <textarea placeholder="必填" @keyup="countEvent" @input="countEvent" v-model="handlebarVal" :class="{blanknull:isTextareaNull}"></textarea>
           </div>
           <div class="mutiBtns mt35">
             <span class="makeSure mr20" @click="handTypeEventsure">确认  
@@ -96,13 +102,23 @@ export default {
       uploadAccount: '',
       uploadAdress: '',
       isAdressNull: false,
-      isAccountNull: false
+      isAccountNull: false,
+      isTextareaNull: false,
+      handlebarVal: '',
+      isCombineShow: false,
+      combinelist: this.listArray[1]
     }
   },
-  props: ['conType', 'conTitle', 'conRank', 'dialogSub'],
+  computed: {
+    isListNull () {
+      return !this.combinelist.length
+    }
+  },
+  props: ['conType', 'conTitle', 'conRank', 'dialogSub', 'listArray'],
   methods: {
-    countEvent: function (e) {
+    countEvent (e) {
       // console.log(e.target.value.length)
+      this.isTextareaNull = false
       let len = e.target.value.length
       if (len >= 0 && len <= 50) {
         this.typeNums = 50 - len
@@ -110,10 +126,10 @@ export default {
         e.target.value = e.target.value.substring(0, 50)
       }
     },
-    dialogClose: function () {
+    dialogClose () {
       this.$emit('dialogclose')
     },
-    uploadEvent: function () {
+    uploadEvent () {
       if (this.uploadAccount === '') {
         this.isAccountNull = true
         return false
@@ -132,14 +148,18 @@ export default {
       }
       this.$emit('uploadeventsure', params)
     },
-    handTypeEventsure: function () {
-      this.$emit('handeventsure')
+    handTypeEventsure () {
+      if (this.handlebarVal === '') {
+        this.isTextareaNull = true
+        return false
+      }
+      this.isTextareaNull = false
+      this.$emit('handeventsure', this.handlebarVal)
     },
-    handTypeEventcancel: function () {
+    handTypeEventcancel () {
       this.$emit('dialogclose')
     },
-    handledata: function (m, n) {
-      console.log(m, n)
+    handledata (m, n) {
       switch (m) {
         case 'year':
           this.year = n
@@ -149,10 +169,27 @@ export default {
           break
         case 'channel':
           this.channel = n
-          console.log(this.channel)
+          this.uploadAccount = ''
+          if (n === '1') {
+            this.combinelist = this.listArray[1]
+          } else if (n === '2') {
+            this.combinelist = this.listArray[2]
+          } else if (n === '3') {
+            this.combinelist = this.listArray[3]
+          }
+          console.log(this.combinelist)
           break
         default: return
       }
+    },
+    combineItemEvent (e) {
+      this.uploadAccount = e.target.innerHTML
+    },
+    combineFocus () {
+      this.isCombineShow = true
+    },
+    combineBlur () {
+      this.isCombineShow = false
     }
   }
 }
@@ -162,6 +199,7 @@ export default {
   border-color: #ff5e5e!important;
   box-shadow: 0 0 5px 0px #ff5e5e!important;
 }
+textarea{border: none;}
 .dialogMaskfix{
   width: 100%;height: 100%;position: absolute;top: 0;left: 0;z-index: 999;
   .dialogMaskbg{

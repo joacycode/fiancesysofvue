@@ -31,112 +31,140 @@
             </div>
             <div class="s-w-r">
                 <div class="searchCondition clearfix">
-                    <ul>
+                    <ul v-show="isTabshow"><!-- 账单状态 -->
                         <li class="s-time clearfix mr30 selectorWrap">
                             <label>时间:</label>
-                            <selector extra-class="selectStya mr10" def-html="2017年" :def-val="byear" select-type="year" select-mean="byear" @chooseopt="handledata"></selector>
-                            <selector extra-class="selectStya" def-html="1月" def-val="01" select-type="month" select-mean="bmonth" @chooseopt="handledata"></selector>
+                            <selector extra-class="selectStya mr10" def-html="2017年" :def-val="byear" select-type="tyYear" select-mean="byear" @chooseopt="handledata"></selector>
+                            <selector extra-class="selectStya" def-html="1月" def-val="01" select-type="tyMonth" select-mean="bmonth" @chooseopt="handledata"></selector>
                             <span class="mr5 ml5">-</span>
-                            <selector extra-class="selectStya mr10" def-html="2017年" :def-val="eyear" select-type="year" select-mean="eyear" @chooseopt="handledata"></selector>
-                            <selector extra-class="selectStya" def-html="1月" def-val="01" select-type="month" select-mean="emonth" @chooseopt="handledata"></selector>
+                            <selector extra-class="selectStya mr10" def-html="2017年" :def-val="eyear" select-type="tyYear" select-mean="eyear" @chooseopt="handledata"></selector>
+                            <selector extra-class="selectStya" def-html="1月" def-val="01" select-type="tyMonth" select-mean="emonth" @chooseopt="handledata"></selector>
                         </li>
-                        <!-- 账单状态 -->
+                        
                         <li class="s-status clearfix selectorWrap" v-show="isTabshow">
                             <label>账单状态:</label>
-                            <selector extra-class="selectStyc" def-html="全部" :def-val="billStatus" select-type="bStatu" select-mean="billStatus" @chooseopt="handledata"></selector>
+                            <selector extra-class="selectStyc" def-html="全部" :def-val="billStatus" select-type="tyBillStatus" select-mean="billStatus" @chooseopt="handledata"></selector>
                         </li>
-                        <li class="s-status clearfix selectorWrap" v-show="!isTabshow">
-                            <label>对账状态:</label>
-                             <selector extra-class="selectStyc" def-html="全部" :def-val="billStatus" select-type="cStatu" select-mean="billStatus" @chooseopt="handledata"></selector>
-                        </li>
-                        <!-- 支付渠道 -->
                         <li class="s-payway clearfix mr20 selectorWrap" v-show="isTabshow">
                             <label>支付渠道:</label>
-                             <selector extra-class="selectStyc" def-html="全部" :def-val="channel" select-type="cNel" select-mean="channel" @chooseopt="handledata"></selector>
-                        </li>
-                        <li class="s-payway clearfix mr20 selectorWrap" v-show="!isTabshow">
-                            <label>支付渠道:</label>
-                             <selector extra-class="selectStyc" def-html="全部" :def-val="channel" select-type="cNel" select-mean="channel" @chooseopt="handledata"></selector>
+                             <selector extra-class="selectStyc" def-html="全部" :def-val="channel" select-type="tyChannel" select-mean="channel" need-total="yes" Bo @chooseopt="handledata" @sendlists="receiveListEvent"></selector>
                         </li>
                         <li class="s-account clearfix">
                             <label>支付账号:</label>
-                            <input type="text" name="account" v-model="accountName"  select-type="accountName"  @focus="combineEvent">
-                            <!--  <div class="combineResWrap">
-                                <p></p>
-                                <ul>
-                                    <li>123</li>
-                                    <li>123</li>
-                                    <li>123</li>
+                            <input type="text" name="account" v-model="accountName" @focus="combineFocus" @blur="combineBlur">
+                            <div class="combineResWrap" v-show="isCombineShow">
+                                <p v-if="isListNull">未找到匹配结果</p>
+                                <ul v-else>
+                                    <li v-for="item in combinelist" @mousedown="combineItemEvent">{{item}}</li>
                                 </ul>
-                            </div> -->
+                            </div>
+                        </li>
+                    </ul>
+                    <ul v-show="!isTabshow"><!-- 支付渠道 -->
+                        <li class="s-time clearfix mr30 selectorWrap">
+                            <label>时间:</label>
+                            <selector extra-class="selectStya mr10" def-html="2017年" :def-val="byear" select-type="tyYear" select-mean="byear" @chooseopt="handledata"></selector>
+                            <selector extra-class="selectStya" def-html="1月" def-val="01" select-type="tyMonth" select-mean="bmonth" @chooseopt="handledata"></selector>
+                            <span class="mr5 ml5">-</span>
+                            <selector extra-class="selectStya mr10" def-html="2017年" :def-val="eyear" select-type="tyYear" select-mean="eyear" @chooseopt="handledata"></selector>
+                            <selector extra-class="selectStya" def-html="1月" def-val="01" select-type="tyMonth" select-mean="emonth" @chooseopt="handledata"></selector>
+                        </li>
+                        <li class="s-status clearfix selectorWrap" v-show="!isTabshow">
+                            <label>对账状态:</label>
+                             <selector extra-class="selectStyc" def-html="全部" :def-val="billStatus" select-type="tyCheckStatus" select-mean="billStatus" @chooseopt="handledata"></selector>
+                        </li>
+                        <li class="s-payway clearfix mr20 selectorWrap">
+                            <label>支付渠道:</label>
+                             <selector extra-class="selectStyc" def-html="全部" :def-val="channel" select-type="tyChannel" select-mean="channel" need-total="yes" @chooseopt="handledata" @sendlists="receiveListEvent"></selector>
+                        </li>
+                        <li class="s-account clearfix">
+                            <label>支付账号:</label>
+                            <input type="text" name="account" v-model="accountName" @focus="combineFocus" @blur="combineBlur">
+                            <div class="combineResWrap" v-show="isCombineShow">
+                                <p v-if="isListNull">未找到匹配结果</p>
+                                <ul v-else>
+                                    <li v-for="item in combinelist" @mousedown="combineItemEvent">{{item}}</li>
+                                </ul>
+                            </div>
                         </li>
                     </ul>
                     <div class="searchBtn">
-                        <span onselectstart="return false;" @click="searchResultEvent">查询</span>
+                        <span onselectstart="return false;" @click="searchResultEvent(1)">查询</span>
                     </div>
                 </div>
                 <div class="searchResult">
-                    <div  v-if="resultShow === 'bill' && billRequestdata">
-                        <div class="overview">共找到<b>{{billTotal}}</b>条信息</div>
-                        <table>
-                            <tr>
-                                <th>账单文件名</th>
-                                <th>支付渠道</th>
-                                <th>支付账号</th>
-                                <th>对账年月</th>
-                                <th>账单状态</th>
-                                <th>上传人</th>
-                                <th>上传时间</th>
-                                <th>操作</th>
-                            </tr>
-                            <tr class="nocheckitem" v-for="item in resultListBill">
-                                <td class="w180 txtpos-l"><p v-if="item.channel === 1">支付宝_{{item.accountName}}_{{item.billTime}}</p><p v-else-if="item.channel === 2">微信_{{item.accountName}}_{{item.billTime}}</p><p v-else-if="item.channel === 3">财付通_{{item.accountName}}_{{item.billTime}}</p><p v-else>{{item.channel}}_{{item.accountName}}_{{item.billTime}}</p></td>
-                                <td class="w90"><p v-if="item.channel === 1">支付宝</p><p v-else-if="item.channel === 2">微信</p><p v-else-if="item.channel === 3">财付通</p><p v-else>{{item.channel}}</p></td>
-                                <td class="w140 txtpos-l">{{item.accountName}}</td>
-                                <td class="w90">{{item.billTime}}</td>
-                                <td class="w90 hlight">{{item.billStatus}}</td>
-                                <td class="w90">{{item.operator}}</td>
-                                <td class="w160">{{item.gmtCreate}}</td>
-                                <td class="w150 operatecheck"><span @click="startCheckBtn(item.id)">对账</span></td>
-                            </tr>
-                        </table>
-                        <pagination v-if="billTotal > 0" @getnewpage="getNewPageEvent" :total-items="billTotal" :page-size="pageSize"></pagination>
+                <!-- v-if="resultShow === 'bill' && billRequestdata"   v-else-if="resultShow === 'check' && checkRequestdata"-->
+                    <div  v-show="isTabshow">
+                        <div v-show="billHasdata">
+                            <div class="overview">共找到<b>{{billTotal}}</b>条信息</div>
+                            <table>
+                                <tr>
+                                    <th>账单文件名</th>
+                                    <th>支付渠道</th>
+                                    <th>支付账号</th>
+                                    <th>对账年月</th>
+                                    <th>账单状态</th>
+                                    <th>上传人</th>
+                                    <th>上传时间</th>
+                                    <th>操作</th>
+                                </tr>
+                                <tr class="nocheckitem" v-for="item in newResultListBill">
+                                    <td class="w180 txtpos-l"><p v-if="item.channel === 1">支付宝_{{item.accountName}}_{{item.billTime}}</p><p v-else-if="item.channel === 2">微信_{{item.accountName}}_{{item.billTime}}</p><p v-else-if="item.channel === 3">财付通_{{item.accountName}}_{{item.billTime}}</p><p v-else>{{item.channel}}_{{item.accountName}}_{{item.billTime}}</p></td>
+                                    <td class="w90"><p v-if="item.channel === 1">支付宝</p><p v-else-if="item.channel === 2">微信</p><p v-else-if="item.channel === 3">财付通</p><p v-else>{{item.channel}}</p></td>
+                                    <td class="w140 txtpos-l">{{item.accountName}}</td>
+                                    <td class="w90">{{item.billTime}}</td>
+                                    <td class="w90 hlight"><p v-if="item.billStatus === 1">对账中</p><p class="c00C651" v-else-if="item.billStatus === 2">对账通过</p><p v-else-if="item.billStatus === 3">对账未通过</p><p class="c666" v-else-if="item.billStatus === 4">已确认</p><p v-else-if="item.billStatus === -1">对账失败</p><p v-else-if="item.billStatus === 0">未对账</p></td>
+                                    <td class="w90">{{item.operator}}</td>
+                                    <td class="w160">{{item.unixtime}}</td>
+                                    <td class="w150 operatecheck"><span  v-if="item.billStatus === 0 || item.billStatus === -1 || item.billStatus === 3" @click="startCheckBtn(item.id)">对账</span></td>
+                                </tr>
+                            </table>
+                            <pagination v-if="billTotal > 0" @getnewpage="getNewPageEvent" :total-items="billTotal" :page-size="pageSize"></pagination>
+                        </div>
+                        <!-- 无结果 -->
+                        <div class="resOfnone" v-show="!billHasdata && billSearchNull">
+                           <div class="bg"></div>
+                           <p>没有找到结果！</p> 
+                        </div>
                     </div>
-                    <div  v-else-if="resultShow === 'check' && checkRequestdata">
-                        <div class="overview">共找到<b>{{checkTotal}}</b>条信息</div>
-                        <table>
-                            <tr>
-                                <th>账单文件名</th>
-                                <th>支付渠道</th>
-                                <th>支付账号</th>
-                                <th>对账年月</th>
-                                <th>对账状态</th>
-                                <th>上传人</th>
-                                <th>上传时间</th>
-                                <th>操作</th>
-                            </tr>
-                            <tr class="nocheckitem" v-for="item in resultListCheck">
-                                <td class="w180 txtpos-l"><p v-if="item.channel === 1">支付宝_{{item.accountName}}_{{item.billTime}}</p><p v-else-if="item.channel === 2">微信_{{item.accountName}}_{{item.billTime}}</p><p v-else-if="item.channel === 3">财付通_{{item.accountName}}_{{item.billTime}}</p><p v-else>{{item.channel}}_{{item.accountName}}_{{item.billTime}}</p></td>
-                                <td class="w90"><p v-if="item.channel === 1">支付宝</p><p v-else-if="item.channel === 2">微信</p><p v-else-if="item.channel === 3">财付通</p><p v-else>{{item.channel}}</p></td>
-                                <td class="w140 txtpos-l">{{item.accountName}}</td>
-                                <td class="w90">{{item.billTime}}</td>
-                                <td class="w90 hlight">{{item.billStatus}}</td>
-                                <td class="w90">{{item.operator}}</td>
-                                <td class="w160">{{item.gmtCreate}}</td>
-                                <td class="w150 operatecheck"><a :href="'/module/detail.html?id=' + item.id + '&' + item.channel + '&' + item.accountName + '&' + item.billTime" target="_blank">详情</a><span @click="confirmCheckBtn(item.id)">确认对账</span></td>
-                            </tr>
-                        </table>
-                        <pagination v-if="checkTotal > 0" @getnewpage="getNewPageEvent" :total-items="checkTotal" :page-size="pageSize"></pagination>
+                    <div  v-show="!isTabshow" >
+                        <div v-if="checkHasdata">
+                            <div class="overview">共找到<b>{{checkTotal}}</b>条信息</div>
+                            <table>
+                                <tr>
+                                    <th>账单文件名</th>
+                                    <th>支付渠道</th>
+                                    <th>支付账号</th>
+                                    <th>对账年月</th>
+                                    <th>对账状态</th>
+                                    <th>上传人</th>
+                                    <th>上传时间</th>
+                                    <th>操作</th>
+                                </tr>
+                                <tr class="nocheckitem" v-for="item in newresultListCheck">
+                                    <td class="w180 txtpos-l"><p v-if="item.channel === 1">支付宝_{{item.accountName}}_{{item.billTime}}</p><p v-else-if="item.channel === 2">微信_{{item.accountName}}_{{item.billTime}}</p><p v-else-if="item.channel === 3">财付通_{{item.accountName}}_{{item.billTime}}</p><p v-else>{{item.channel}}_{{item.accountName}}_{{item.billTime}}</p></td>
+                                    <td class="w90"><p v-if="item.channel === 1">支付宝</p><p v-else-if="item.channel === 2">微信</p><p v-else-if="item.channel === 3">财付通</p><p v-else>{{item.channel}}</p></td>
+                                    <td class="w140 txtpos-l">{{item.accountName}}</td>
+                                    <td class="w90">{{item.billTime}}</td>
+                                    <td class="w90 hlight"><p v-if="item.billStatus === 1">对账中</p><p class="c00C651" v-else-if="item.billStatus === 2">对账通过</p><p v-else-if="item.billStatus === 3">对账未通过</p><p class="c666" v-else-if="item.billStatus === 4">已确认</p><p v-else-if="item.billStatus === -1">对账失败</p><p v-else-if="item.billStatus === 0">未对账</p></td>
+                                    <td class="w90">{{item.operator}}</td>
+                                    <td class="w160">{{item.unixtime}}</td>
+                                    <td class="w150 operatecheck"><a :href="'/module/detail.html?id=' + item.id + '&' + item.channel + '&' + item.accountName + '&' + item.billTime" target="_blank">详情</a><span v-if="item.billStatus !== 4" @click="confirmCheckBtn(item.id)">确认对账</span></td>
+                                </tr>
+                            </table>
+                            <pagination v-if="checkTotal > 0" @getnewpage="getNewPageEvent" :total-items="checkTotal" :page-size="pageSize"></pagination>
+                        </div>
+                        <!-- 无结果 -->
+                        <div class="resOfnone" v-show="!checkHasdata && checkSearchNull">
+                           <div class="bg"></div>
+                           <p>没有找到结果！</p> 
+                        </div>
                     </div>
-                    <!-- 无结果 -->
-                    <div class="resOfnone" v-else-if="resultShow === 'nores'">
-                       <div class="bg"></div>
-                       <p>没有找到结果！</p> 
-                    </div>
+                    
                 </div>
             </div>
         </div>       
-        <dialogpop v-if="isShowthis" :con-type="dialogType" :con-title="dialogTitle" :con-rank="dialogRank" :dialog-sub="hasDialogsub" @dialogclose="closeEvent" @uploadeventsure="toUploadEvent"><p>{{dialogHtml}}</p><p v-if="hasDialogsub">{{dialogHtmlSub}}</p></dialogpop>
+        <dialogpop v-if="isShowthis" :con-type="dialogType" :con-title="dialogTitle" :con-rank="dialogRank" :dialog-sub="hasDialogsub" :list-array="allListArray" @dialogclose="closeEvent" @uploadeventsure="toUploadEvent"><p>{{dialogHtml}}</p><p v-if="hasDialogsub">{{dialogHtmlSub}}</p></dialogpop>
     </div>
 </body>
 </html>
