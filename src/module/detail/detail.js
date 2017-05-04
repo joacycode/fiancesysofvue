@@ -4,6 +4,7 @@ import Cookie from 'js-cookie'
 require('assets/less/main.less')
 
 import Dialogpop from '../../components/dialogpop'
+import Selector from '../../components/selector'
 import store from '../../assets/js/store/index'
 import Pagination from '../../components/pagination'
 
@@ -38,18 +39,22 @@ new Vue({
     detailTotal: 0,
     uncheckTotal: 0,
     pageSize: 20,
-    hasUncheckTab: false
+    hasUncheckTab: false,
+    verifyVal: '',
+    curUncheckPage: 1,
+    curBillPage: 1
   },
   computed: {
-    exporturi: function () {
+    exporturi () { // 未核对订单为空 导出地址为#
       return 'http://financial-checking.heyi.test/statement/exportUncheck?id=' + this.billid
     }
   },
   components: {
     'dialogpop': Dialogpop,
-    'pagination': Pagination
+    'pagination': Pagination,
+    'selector': Selector
   },
-  mounted: function () {
+  mounted () {
     let ref = window.location.search
     let arr = ref.split('&')
     _this = this
@@ -58,12 +63,12 @@ new Vue({
     this.billAccount = arr[2]
     this.billTime = arr[3].substring(0, 4) + '-' + arr[3].substring(4)
     this.detailBillOverview()
+    this.detialUncheckOverview()
     this.detailBillEvent({pageSize: this.pageSize, pageNo: 1})
     this.detialUncheckEvent({pageSize: this.pageSize, pageNo: 1})
-    this.detialUncheckOverview()
   },
   methods: {
-    tohandeventsure: function (val) {
+    tohandeventsure (val) {
       this.commonFormReq({ // detial uncheck overview
         apiurl: 'http://financial-checking.heyi.test/statement/uncheckConfirm?id=',
         datas: {reason: val},
@@ -78,7 +83,7 @@ new Vue({
         }
       })
     },
-    detailBillEvent: function (params) { // detail bill
+    detailBillEvent (params) { // detail bill
       this.commonFormReq({
         apiurl: 'http://financial-checking.heyi.test/statement/detailInfo?billId=',
         datas: params || '',
@@ -92,7 +97,7 @@ new Vue({
         }
       })
     },
-    detailBillOverview: function () { // detail bill overview
+    detailBillOverview () { // detail bill overview
       this.commonFormReq({
         apiurl: 'http://financial-checking.heyi.test/statement/detailInfoStatistics?billId=',
         datas: '',
@@ -107,7 +112,7 @@ new Vue({
         }
       })
     },
-    detialUncheckEvent: function (params) { // detial uncheck
+    detialUncheckEvent (params) { // detial uncheck
       this.commonFormReq({
         apiurl: 'http://financial-checking.heyi.test/statement/uncheckInfo?billId=',
         datas: params || '',
@@ -122,7 +127,7 @@ new Vue({
         }
       })
     },
-    detialUncheckOverview: function () { // detial uncheck overview
+    detialUncheckOverview () { // detial uncheck overview
       this.commonFormReq({
         apiurl: 'http://financial-checking.heyi.test/statement/uncheckInfoStatistics?billId=',
         datas: '',
@@ -137,7 +142,7 @@ new Vue({
         }
       })
     },
-    commonFormReq: function (params) {
+    commonFormReq (params) {
       $.ajax({
         url: params.apiurl + this.billid,
         type: 'GET',
@@ -153,27 +158,43 @@ new Vue({
         console.log('请求数据失败！', Xhr, txt)
       })
     },
-    closeEvent: function () {
+    closeEvent () {
       this.isShowthis = false
       // window.location.href = window.location.href
     },
-    handComfirmEvent: function () {
+    handComfirmEvent () {
       this.isShowthis = true
       this.dialogType = 'handlebar'
     },
-    checkDetailTab: function () {
+    checkDetailTab () {
       this.ischeckDetailTab = true
     },
-    uncheckedTab: function () {
+    uncheckedTab () {
       this.ischeckDetailTab = false
     },
-    getBillNewPage: function (current) {
+    getBillNewPage (current) {
+      this.curBillPage = current
+      this.detailBillOverview()
       this.detailBillEvent({pageSize: this.pageSize, pageNo: current})
     },
-    getUncheckNewPage: function (current) {
+    getUncheckNewPage (current) {
+      this.curUncheckPage = current
+      this.detialUncheckOverview()
       this.detialUncheckEvent({pageSize: this.pageSize, pageNo: current})
     },
-    logoutReq: function () {
+    handledata (m, n) {
+      if (m === 'verify' && n !== '') {
+        this.verifyVal = n
+        if (this.ischeckDetailTab) {
+          this.detailBillOverview()
+          this.detailBillEvent({pageSize: this.pageSize, pageNo: this.curBillPage, verifyResult: this.verifyVal})
+        } else {
+          this.detialUncheckOverview()
+          this.detialUncheckEvent({pageSize: this.pageSize, pageNo: this.curUncheckPage, verifyResult: this.verifyVal})
+        }
+      }
+    },
+    logoutReq () {
       if (this.canlgout) {
         this.canlgout = false
         $.ajax({

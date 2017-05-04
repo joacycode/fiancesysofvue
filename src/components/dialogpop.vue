@@ -11,7 +11,7 @@
             <!-- conRank: warn success notice -->
             <div class="middler" :class="conRank"> 
               <span class="ico"></span>
-              <div class="multiWords" v-if="dialogSub == true">
+              <div class="multiWords" v-if="dialogSub && dialogSub == true">
                   <slot></slot>
               </div>
               <div class="signlWords" v-else>
@@ -44,7 +44,7 @@
             <span class="close"  @click="dialogClose"></span>
           </div>
           <div class="former">
-            <div class="formitem">
+            <div class="formitem selectorWrap">
               <span>支付渠道</span><selector class="ty_long selector" def-html="支付宝" :def-val="channel" select-type="tyChannel" select-mean="channel" @chooseopt="handledata"></selector>
             </div>
             <div class="formitem">
@@ -80,6 +80,15 @@
             </span><span class="cancel" @click="handTypeEventcancel">取消</span>
           </div>
         </div>
+        <div v-else-if="conType == 'loading'">
+          <div class="spinner">
+            <div class="rect1"></div>
+            <div class="rect2"></div>
+            <div class="rect3"></div>
+            <div class="rect4"></div>
+            <div class="rect5"></div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -94,7 +103,6 @@ export default {
   },
   data () {
     return {
-      msg: '213123123',
       typeNums: 50,
       year: 2017,
       month: '01',
@@ -106,7 +114,7 @@ export default {
       isTextareaNull: false,
       handlebarVal: '',
       isCombineShow: false,
-      combinelist: this.listArray[1]
+      combinelist: ''
     }
   },
   computed: {
@@ -114,7 +122,27 @@ export default {
       return !this.combinelist.length
     }
   },
-  props: ['conType', 'conTitle', 'conRank', 'dialogSub', 'listArray'],
+  props: {
+    conType: {
+      type: String,
+      reqirue: true
+    },
+    conTitle: {
+      type: String,
+      reqirue: true
+    },
+    conRank: {
+      type: String,
+      reqirue: true
+    },
+    dialogSub: Boolean,
+    uploadArray: Array
+  },
+  mounted: function () {
+    if (this.uploadArray) {
+      this.combinelist = this.uploadArray[1]
+    }
+  },
   methods: {
     countEvent (e) {
       // console.log(e.target.value.length)
@@ -171,11 +199,11 @@ export default {
           this.channel = n
           this.uploadAccount = ''
           if (n === '1') {
-            this.combinelist = this.listArray[1]
+            this.combinelist = this.uploadArray[1]
           } else if (n === '2') {
-            this.combinelist = this.listArray[2]
+            this.combinelist = this.uploadArray[2]
           } else if (n === '3') {
-            this.combinelist = this.listArray[3]
+            this.combinelist = this.uploadArray[3]
           }
           console.log(this.combinelist)
           break

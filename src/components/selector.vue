@@ -1,5 +1,5 @@
 <template>
-  <div class="selectPicker" :class="extraClass" :data-value="toShowval" :data-mean="selectMean">
+  <div class="selectPicker" :class="extraClass" :data-value="toShowval">
     <span class="defaultVal" @click.stop="updowns" v-html="toShowhtml"></span>
     <ul>
       <li v-for="item in selectOpts" :data-value="item.id" @click="chooseopt">{{item.name}}</li>
@@ -42,7 +42,7 @@ export default {
         case 'tyCheckStatus':
           return [{id: -2, name: '全部'}, {id: 2, name: '对账通过'}, {id: 3, name: '对账不通过'}, {id: 0, name: '未对账'}, {id: 4, name: '已确认'}]
         case 'tyVerify':
-          return [{id: 0, name: '一致'}, {id: 1, name: '不一致'}]
+          return [{id: '', name: '核对结果'}, {id: 0, name: '一致'}, {id: 1, name: '不一致'}]
         case 'tyChannel':
           return this.channels
         default:

@@ -50,7 +50,7 @@
               <th>收入金额(元)</th>
               <th>支出金额(元)</th>
               <th>业务类型</th>
-              <th class="w180">核对结果</th>
+              <th class="w180"><selector extra-class="selectStyc" def-html="核对结果" :def-val="verifyVal" select-type="tyVerify" select-mean="verify" @chooseopt="handledata"></selector></th>
               <th class="w300">操作</th>
             </tr>
             <tr v-for="item in billDetailList">
@@ -76,7 +76,7 @@
               <th>收入金额(元)</th>
               <th>支出金额(元)</th>
               <th>业务类型</th>
-              <th class="w180">核对结果</th>
+              <th class="w180"><selector extra-class="selectStyc" def-html="核对结果" :def-val="verifyVal" select-type="tyVerify" select-mean="verify" @chooseopt="handledata"></th>
               <th class="w300">操作</th>
             </tr>
             <tr v-for="item in unCheckedList">

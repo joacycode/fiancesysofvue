@@ -89,7 +89,7 @@
                         </li>
                     </ul>
                     <div class="searchBtn">
-                        <span onselectstart="return false;" @click="searchResultEvent(1)">查询</span>
+                        <span onselectstart="return false;" @click="searchResultEvent()">查询</span>
                     </div>
                 </div>
                 <div class="searchResult">
@@ -164,7 +164,7 @@
                 </div>
             </div>
         </div>       
-        <dialogpop v-if="isShowthis" :con-type="dialogType" :con-title="dialogTitle" :con-rank="dialogRank" :dialog-sub="hasDialogsub" :list-array="allListArray" @dialogclose="closeEvent" @uploadeventsure="toUploadEvent"><p>{{dialogHtml}}</p><p v-if="hasDialogsub">{{dialogHtmlSub}}</p></dialogpop>
+        <dialogpop v-if="isShowthis" :con-type="dialogType" :con-title="dialogTitle" :con-rank="dialogRank" :dialog-sub="hasDialogsub" :upload-array="uploadCombinelList" @dialogclose="closeEvent" @uploadeventsure="toUploadEvent"><p>{{dialogHtml}}</p><p v-if="hasDialogsub">{{dialogHtmlSub}}</p></dialogpop>
     </div>
 </body>
 </html>

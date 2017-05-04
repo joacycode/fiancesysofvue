@@ -49,7 +49,8 @@ new Vue({
     pageSize: 10,
     combinelist: [],
     allListArray: [],
-    isCombineShow: false
+    isCombineShow: false,
+    uploadCombinelList: []
   },
   computed: {
     newResultListBill () {
@@ -66,6 +67,9 @@ new Vue({
     },
     saveCheckCondition () {
       return {byear: '2017', bmonth: '01', eyear: '2017', emonth: '01', billStatus: '-2', channel: '-2', accountName: '', combinelist: this.allListArray[0]}
+    },
+    getFormsUrl () {
+      return this.isTabshow ? 'http://financial-checking.heyi.test/bill/selectBillInfoByPage' : 'http://financial-checking.heyi.test/bill/selectBillStatementByPage'
     }
   },
   methods: {
@@ -78,7 +82,7 @@ new Vue({
         accountName: this.accountName,
         pageNo: 1,
         pageSize: this.pageSize
-      })
+      }, this.getFormsUrl)
     },
     billTabEvent () { // 账单tab
       if (!this.isTabshow) {
@@ -141,7 +145,7 @@ new Vue({
         accountName: this.accountName,
         pageNo: current,
         pageSize: this.pageSize
-      })
+      }, this.getFormsUrl)
     },
     handledata (m, n) { // 根据被触发的组件含义对应处理[自定义事件]
       switch (m) {
@@ -173,9 +177,6 @@ new Vue({
             this.combinelist = this.allListArray[0]
           }
           break
-        case 'accountName':
-          this.accountName = n
-          break
         default: return
       }
     },
@@ -189,9 +190,11 @@ new Vue({
       this.isShowthis = true
       this.dialogType = 'uploaddbar'
       this.dialogTitle = '上传账单'
+      this.uploadCombinelList = this.allListArray
     },
     closeEvent () { // dialog关闭事件
       this.isShowthis = false
+      this.uploadCombinelList = []
       // window.location.href = window.location.href
     },
     toUploadEvent (params) { // 上传确认
@@ -226,9 +229,9 @@ new Vue({
     confirmCheckBtn (id) { // 确认对账
       this.checkBtnRequst({apiurl: 'http://financial-checking.heyi.test/statement/confirm?id=', apiid: id})
     },
-    getBilldata (params) { // 获取账单和对账表方法
+    getBilldata (params, _url) { // 获取账单和对账表方法
       $.ajax({
-        url: 'http://financial-checking.heyi.test/bill/selectBillInfoByPage',
+        url: _url,
         type: 'GET',
         dataType: 'jsonp',
         jsonp: 'jsoncallback',
