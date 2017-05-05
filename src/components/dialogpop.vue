@@ -45,7 +45,7 @@
           </div>
           <div class="former">
             <div class="formitem selectorWrap">
-              <span>支付渠道</span><selector class="ty_long selector" def-html="支付宝" :def-val="channel" select-type="tyChannel" select-mean="channel" @chooseopt="handledata"></selector>
+              <span>支付渠道</span><selector class="ty_long selector" default-html="支付宝" :default-val="channel" select-type="channel" select-mean="channel" @chooseopt="handledata"></selector>
             </div>
             <div class="formitem">
               <span>支付账号</span><input type="text" class="ty_long" v-model="uploadAccount" :class="{blanknull:isAccountNull}" @focus="combineFocus" @blur="combineBlur">
@@ -57,7 +57,7 @@
                 </div>
             </div>
             <div class="formitem selectorWrap">
-              <span>账单年月</span> <selector class="selector mr10 " def-html="2017年" :def-val="year" select-type="tyYear" select-mean="year" @chooseopt="handledata"></selector><selector class="selector" def-html="1月" :def-val="month" select-type="tyMonth" select-mean="month" @chooseopt="handledata"></selector>
+              <span>账单年月</span> <selector class="selector mr10 " default-html="2017年" :default-val="year" select-type="year" select-mean="year" @chooseopt="handledata"></selector><selector class="selector" default-html="1月" :default-val="month" select-type="month" select-mean="month" @chooseopt="handledata"></selector>
             </div>
             <div class="formitem">
               <span>账单地址</span><input type="text" class="ty_long" v-model="uploadAdress" :class="{blanknull:isAdressNull}">
@@ -78,15 +78,6 @@
           <div class="mutiBtns mt35">
             <span class="makeSure mr20" @click="handTypeEventsure">确认  
             </span><span class="cancel" @click="handTypeEventcancel">取消</span>
-          </div>
-        </div>
-        <div v-else-if="conType == 'loading'">
-          <div class="spinner">
-            <div class="rect1"></div>
-            <div class="rect2"></div>
-            <div class="rect3"></div>
-            <div class="rect4"></div>
-            <div class="rect5"></div>
           </div>
         </div>
       </div>

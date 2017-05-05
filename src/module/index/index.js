@@ -1,16 +1,19 @@
+require('assets/less/main.less')
+
 import Vue from 'vue'
 import $ from 'jquery'
 import Cookie from 'js-cookie'
-require('assets/less/main.less')
-
+import VueResource from 'vue-resource'
 import Selector from '../../components/selector'
 import Dialogpop from '../../components/dialogpop'
 import store from '../../assets/js/store/index'
 import Pagination from '../../components/pagination'
-/* eslint-disable no-new */
 
+Vue.use(VueResource)
+
+/* eslint-disable no-new */
 new Vue({
-  store,
+  store, // vuex store
   components: {
     'selector': Selector,
     'dialogpop': Dialogpop,
@@ -53,7 +56,7 @@ new Vue({
     uploadCombinelList: []
   },
   computed: {
-    newResultListBill () {
+    newResultListBill () { // 统一数据处理新数据
       return this.transformData(this.resultListBill)
     },
     newresultListCheck () {
@@ -197,30 +200,22 @@ new Vue({
       this.uploadCombinelList = []
       // window.location.href = window.location.href
     },
-    toUploadEvent (params) { // 上传确认
-      $.ajax({
-        url: 'http://financial-checking.heyi.test/bill/addBill',
-        type: 'get',
-        dataType: 'jsonp',
-        jsonp: 'jsoncallback',
-        jsonCallback: 'getData',
-        data: $.param(params)
-      })
-      .done((res) => {
+    toUploadEvent (paramsObj) { // 上传确认
+      this.$http.jsonp('http://financial-checking.heyi.test/bill/addBill', {jsonp: 'jsoncallback', params: paramsObj}).then((response) => {
+        // console.log(response.body.data)
         this.dialogType = 'dialogbar'
-        if (res.code !== 0) {
+        if (response.body.code !== 0) {
           this.dialogType = 'dialogbar'
           this.dialogRank = 'notice'
-          this.dialogHtml = res.message
+          this.dialogHtml = response.body.message
         } else {
           // this.dialogType = 'progressbar'
           this.dialogType = 'dialogbar'
           this.dialogRank = 'success'
           this.dialogHtml = '上传成功'
         }
-      })
-      .fail((XHR, textStatus, errorThrown) => {
-        console.log(textStatus)
+      }, (errResponse) => {
+        console.log(errResponse)
       })
     },
     startCheckBtn (id) { // 开始对账
@@ -229,27 +224,20 @@ new Vue({
     confirmCheckBtn (id) { // 确认对账
       this.checkBtnRequst({apiurl: 'http://financial-checking.heyi.test/statement/confirm?id=', apiid: id})
     },
-    getBilldata (params, _url) { // 获取账单和对账表方法
-      $.ajax({
-        url: _url,
-        type: 'GET',
-        dataType: 'jsonp',
-        jsonp: 'jsoncallback',
-        jsonpCallback: 'getData',
-        data: $.param(params)
-      })
-      .done((res) => {
-        if (res.code === 0) {
+    getBilldata (paramsObj, _url) { // 获取账单和对账表方法
+      this.$http.jsonp(_url, {jsonp: 'jsoncallback', params: paramsObj}).then((response) => {
+        // console.log(response.body.data)
+        if (response.body.code === 0) {
           if (this.isTabshow) {
             this.billHasdata = true
             this.billSearchNull = false
-            this.resultListBill = res.data.dataList
-            this.billTotal = res.data.totalCount
+            this.resultListBill = response.body.data.dataList
+            this.billTotal = response.body.data.totalCount
           } else {
             this.checkHasdata = true
             this.checkSearchNull = false
-            this.resultListCheck = res.data.dataList
-            this.checkTotal = res.data.totalCount
+            this.resultListCheck = response.body.data.dataList
+            this.checkTotal = response.body.data.totalCount
           }
         } else {
           if (this.isTabshow) {
@@ -260,40 +248,50 @@ new Vue({
             this.checkSearchNull = true
           }
         }
-      })
-      .fail(() => {
-        console.log('请求数据失败！')
+      }, (errResponse) => {
+        console.log(errResponse)
       })
     },
-    transformData (datalist) { // 数据转换方法
+    transformData (datalist) { // 增加转换新数据
       for (let item of datalist) {
-        item['unixtime'] = this.unixTimeto(item.gmtCreate)
+        item['unixTime'] = this.unixTimeto(item.gmtCreate)
+        switch (item.channel) {
+          case 1:
+            item['fileName'] = '支付宝_' + item.accountName + '_' + item.billTime
+            item['channelName'] = '支付宝'
+            break
+          case 2:
+            item['fileName'] = '微信_' + item.accountName + '_' + item.billTime
+            item['channelName'] = '微信'
+            break
+          case 3:
+            item['fileName'] = '财付通_' + item.accountName + '_' + item.billTime
+            item['channelName'] = '财付通'
+            break
+          default:
+            item['fileName'] = item.channel + '_' + item.accountName + '_' + item.billTime
+            item['channelName'] = '未知'
+            break
+        }
       }
       return datalist
     },
-    checkBtnRequst (params) { // 对账api
-      $.ajax({
-        url: params.apiurl + params.apiid,
-        type: 'GET',
-        dataType: 'jsonp',
-        jsonp: 'jsoncallback',
-        jsonpCallback: 'getData'
-      })
-      .done((res) => {
-        if (res.code === 0) {
+    checkBtnRequst (paramsObj) { // 对账api
+      this.$http.jsonp(paramsObj.apiurl + paramsObj.apiid, {jsonp: 'jsoncallback'}).then((response) => {
+        console.log(response)
+        if (response.body.code === 0) {
           this.isShowthis = true
           this.dialogType = 'dialogbar'
           this.dialogRank = 'success'
-          this.dialogHtml = res.message || '操作成功'
+          this.dialogHtml = '操作成功'
         } else {
           this.isShowthis = true
           this.dialogType = 'dialogbar'
           this.dialogRank = 'notice'
-          this.dialogHtml = res.message
+          this.dialogHtml = response.body.message
         }
-      })
-      .fail(() => {
-        console.log('请求数据失败！')
+      }, (errResponse) => {
+        console.log(errResponse)
       })
     },
     unixTimeto (t) { // unix时间转换YYYY-MM-DD HH:MM:SS
@@ -316,23 +314,19 @@ new Vue({
     logoutReq () { // 登出
       if (this.canlgout) {
         this.canlgout = false
-        $.ajax({
-          url: 'http://financial-checking.heyi.test/user/logout',
-          type: 'GET',
-          dataType: 'jsonp',
-          jsonp: 'jsoncallback',
-          jsonpCallback: 'getData'
-        })
-        .done((res) => {
+        this.$http.jsonp('http://financial-checking.heyi.test/user/logout', {jsonp: 'jsoncallback'}).then((response) => {
+          // console.log(response.body.data)
           this.canlgout = true
-          Cookie.remove('loginSure')
-          window.location.href = window.location.href
-        })
-        .fail(() => {
+          if (response.body.code === 0) {
+            Cookie.remove('loginSure')
+            window.location.href = window.location.href
+          }
+        }, (errResponse) => {
           this.canlgout = true
-          console.log('请求数据失败！')
+          console.log(errResponse)
         })
       }
     }
+
   }
 })

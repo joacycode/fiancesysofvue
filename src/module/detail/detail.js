@@ -1,13 +1,14 @@
-import Vue from 'vue'
-import $ from 'jquery'
-import Cookie from 'js-cookie'
 require('assets/less/main.less')
 
+import Vue from 'vue'
+import Cookie from 'js-cookie'
+import VueResource from 'vue-resource'
 import Dialogpop from '../../components/dialogpop'
 import Selector from '../../components/selector'
 import store from '../../assets/js/store/index'
 import Pagination from '../../components/pagination'
 
+Vue.use(VueResource)
 let _this
 /* eslint-disable no-new */
 new Vue({
@@ -45,7 +46,7 @@ new Vue({
     curBillPage: 1
   },
   computed: {
-    exporturi () { // 未核对订单为空 导出地址为#
+    exporturi () {
       return 'http://financial-checking.heyi.test/statement/exportUncheck?id=' + this.billid
     }
   },
@@ -83,11 +84,10 @@ new Vue({
         }
       })
     },
-    detailBillEvent (params) { // detail bill
+    detailBillEvent (datas) { // detail bill
       this.commonFormReq({
         apiurl: 'http://financial-checking.heyi.test/statement/detailInfo?billId=',
-        datas: params || '',
-        diffcallback: 'getdetail',
+        _params: {jsonp: 'jsoncallback', params: datas},
         callbackFun (res) {
           if (res.code === 0) {
             _this.billDetailList = res.data.dataList
@@ -100,8 +100,7 @@ new Vue({
     detailBillOverview () { // detail bill overview
       this.commonFormReq({
         apiurl: 'http://financial-checking.heyi.test/statement/detailInfoStatistics?billId=',
-        datas: '',
-        diffcallback: 'getdetailov',
+        _params: {jsonp: 'jsoncallback'},
         callbackFun (res) {
           if (res.code === 0) {
             console.log('对账数据统计', res.data, res.data.refund, res.data.fee)
@@ -112,11 +111,10 @@ new Vue({
         }
       })
     },
-    detialUncheckEvent (params) { // detial uncheck
+    detialUncheckEvent (datas) { // detial uncheck
       this.commonFormReq({
         apiurl: 'http://financial-checking.heyi.test/statement/uncheckInfo?billId=',
-        datas: params || '',
-        diffcallback: 'getuncheck',
+        _params: {jsonp: 'jsoncallback', params: datas},
         callbackFun (res) {
           if (res.code === 0) {
             _this.hasUncheckTab = true // 显示出未核对tab
@@ -130,8 +128,7 @@ new Vue({
     detialUncheckOverview () { // detial uncheck overview
       this.commonFormReq({
         apiurl: 'http://financial-checking.heyi.test/statement/uncheckInfoStatistics?billId=',
-        datas: '',
-        diffcallback: 'getuncheckov',
+        _params: {jsonp: 'jsoncallback'},
         callbackFun (res) {
           if (res.code === 0) {
             console.log('未核对统计', res, res.data.refund, res.data.fee)
@@ -142,20 +139,12 @@ new Vue({
         }
       })
     },
-    commonFormReq (params) {
-      $.ajax({
-        url: params.apiurl + this.billid,
-        type: 'GET',
-        dataType: 'jsonp',
-        jsonp: 'jsoncallback',
-        jsonpCallback: params.diffcallback,
-        data: params.datas ? $.param(params.datas) : ''
-      })
-      .done((res) => {
-        params.callbackFun(res)
-      })
-      .fail((Xhr, txt) => {
-        console.log('请求数据失败！', Xhr, txt)
+    commonFormReq (paramsObj) {
+      this.$http.jsonp(paramsObj.apiurl + this.billid, paramsObj._params).then((response) => {
+        // console.log(response.body.data)
+        paramsObj.callbackFun(response.body)
+      }, (errResponse) => {
+        console.log(errResponse)
       })
     },
     closeEvent () {
@@ -197,24 +186,20 @@ new Vue({
     logoutReq () {
       if (this.canlgout) {
         this.canlgout = false
-        $.ajax({
-          url: 'http://financial-checking.heyi.test/user/logout',
-          type: 'GET',
-          dataType: 'jsonp',
-          jsonp: 'jsoncallback',
-          jsonpCallback: 'getData'
-        })
-        .done((res) => {
+        this.$http.jsonp('http://financial-checking.heyi.test/user/logout', {jsonp: 'jsoncallback'}).then((response) => {
+          // console.log(response.body.data)
           this.canlgout = true
-          Cookie.remove('loginSure')
-          window.location.href = window.location.href
-        })
-        .fail(() => {
+          if (response.body.code === 0) {
+            Cookie.remove('loginSure')
+            window.location.href = window.location.href
+          }
+        }, (errResponse) => {
           this.canlgout = true
-          console.log('请求数据失败！')
+          console.log(errResponse)
         })
       }
     }
+
   }
 })
 
