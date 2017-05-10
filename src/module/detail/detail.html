@@ -60,7 +60,7 @@
               <td><p v-if="item.type === 1">在线支付</p><p v-else-if="item.type === 2">交易退款</p><p v-else-if="item.type === 3">手续费</p></td>
               <td><p v-if="item.verifyResult === 1">一致</p><p v-else-if="item.verifyResult === 0">不一致</p><p v-else>无</p></td>
               <td class="txtpos-l" v-if="!!item.verifyResult">{{item.reason}}</td>
-              <td class="handleConf" v-else><span @click="handComfirmEvent">手动确认</span></td>
+              <td class="handleConf" v-else><span @click="handComfirmEvent(item)">手动确认</span></td>
             </tr>
           </table>
           <pagination v-if="detailTotal > 0" @getnewpage="getBillNewPage" :total-items="detailTotal" :page-size="pageSize"></pagination>
@@ -76,7 +76,7 @@
               <th>收入金额(元)</th>
               <th>支出金额(元)</th>
               <th>业务类型</th>
-              <th class="w180"><selector extra-class="selectStyc" def-html="核对结果" :def-val="verifyVal" select-type="tyVerify" select-mean="verify" @chooseopt="handledata"></th>
+              <th class="w180">核对结果</th>
               <th class="w300">操作</th>
             </tr>
             <tr v-for="item in unCheckedList">
@@ -86,13 +86,14 @@
               <td><p v-if="item.type === 1">在线支付</p><p v-else-if="item.type === 2">交易退款</p><p v-else-if="item.type === 3">手续费</p></td>
               <td><p v-if="item.verifyResult === 1">一致</p><p v-else-if="item.verifyResult === 0">不一致</p><p v-else>无</p></td>
               <td class="txtpos-l" v-if="!!item.verifyResult">{{item.reason}}</td>
-              <td class="handleConf" v-else><span @click="handComfirmEvent">手动确认</span></td>
+              <td class="handleConf" v-else><span @click="handComfirmEvent(item)">手动确认</span></td>
             </tr>
           </table>
           <pagination v-if="uncheckTotal > 0" @getnewpage="getUncheckNewPage" :total-items="uncheckTotal" :page-size="pageSize"></pagination>
         </div>
       </div>
     </div>
+    <loadiner v-if="isloading"></loadiner>
     <dialogpop v-if="isShowthis" :con-type="dialogType" :con-title="dialogTitle" :con-rank="dialogRank" :dialog-sub="hasDialogsub" @dialogclose="closeEvent"  @handeventsure="tohandeventsure"><p>{{dialogHtml}}</p><p v-if="hasDialogsub">{{dialogHtmlSub}}</dialogpop>
   </div>
 </body>

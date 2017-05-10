@@ -4,7 +4,6 @@ var config = require('../config')
 var vueLoaderConfig = require('./vue-loader.conf')
 var glob = require('glob')
 var entries = getEntry('./src/module/**/*.js') // 获得入口js文件
-// var ExtractTextPlugin = require('extract-text-webpack-plugin')
 
 function resolve (dir) {
   return path.join(__dirname, '..', dir)
@@ -13,12 +12,12 @@ function getEntry(globPath) {
   var entries = {},
       basename, tmp, pathname;
   glob.sync(globPath).forEach(function (entry) {
-    basename = path.basename(entry, path.extname(entry));
-    tmp = entry.split('/').splice(-3);
-    pathname = tmp.splice(0, 1) + '/' + basename; // 正确输出js和html的路径
+    basename = path.basename(entry, path.extname(entry)); // detail index login...
+    tmp = entry.split('/').splice(-3); // tmp.splice(0, 1) [module, ** ,*.js]
+    pathname = tmp.splice(0, 1) + '/' + basename;
     entries[pathname] = entry;
   });
-  // console.log(entries);
+  console.log(entries);
   return entries;
 }
 

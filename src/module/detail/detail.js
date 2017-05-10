@@ -3,10 +3,11 @@ require('assets/less/main.less')
 import Vue from 'vue'
 import Cookie from 'js-cookie'
 import VueResource from 'vue-resource'
-import Dialogpop from '../../components/dialogpop'
+import Loadiner from '../../components/loadiner'
 import Selector from '../../components/selector'
-import store from '../../assets/js/store/index'
 import Pagination from '../../components/pagination'
+import Dialogpop from '../../components/dialogpop'
+import store from '../../assets/js/store/index'
 
 Vue.use(VueResource)
 let _this
@@ -16,7 +17,7 @@ new Vue({
   store,
   el: '#detailPage',
   data: {
-    isShowthis: false,
+    isShowthis: false, // 弹框显示
     billid: '',
     payChannel: '',
     billAccount: '',
@@ -43,17 +44,21 @@ new Vue({
     hasUncheckTab: false,
     verifyVal: '',
     curUncheckPage: 1,
-    curBillPage: 1
+    curBillPage: 1,
+    isloading: false,
+    itemId: '',
+    itemType: ''
   },
   computed: {
     exporturi () {
-      return 'http://financial-checking.heyi.test/statement/exportUncheck?id=' + this.billid
+      return 'http://financial.manage.youku.com/statement/exportUncheck?id=' + this.billid
     }
   },
   components: {
     'dialogpop': Dialogpop,
     'pagination': Pagination,
-    'selector': Selector
+    'selector': Selector,
+    'loadiner': Loadiner
   },
   mounted () {
     let ref = window.location.search
@@ -69,37 +74,58 @@ new Vue({
     this.detialUncheckEvent({pageSize: this.pageSize, pageNo: 1})
   },
   methods: {
-    tohandeventsure (val) {
-      this.commonFormReq({ // detial uncheck overview
-        apiurl: 'http://financial-checking.heyi.test/statement/uncheckConfirm?id=',
-        datas: {reason: val},
-        callbackFun (res) {
-          if (res.code === 0) {
-            window.location.href = window.location.href
-          } else {
-            _this.dialogType = 'dialogbar'
-            _this.dialogRank = 'notice'
-            _this.dialogHtml = res.message || '手动确认有误'
-          }
+    tohandeventsure (thisrea) {
+      let apiurl, paramsObj
+      if (this.ischeckDetailTab) {
+        apiurl = 'http://financial.manage.youku.com/statement/uncheckConfirm'
+        paramsObj = {id: this.itemId, reason: encodeURI(encodeURI(thisrea))}
+      } else {
+        apiurl = 'http://financial.manage.youku.com/statement/uncheckConfirmCharge'
+        paramsObj = {id: this.itemId, reason: encodeURI(encodeURI(thisrea)), type: this.itemType}
+      }
+      this.$http.jsonp(apiurl, {jsonp: 'jsoncallback', params: paramsObj}).then((response) => {
+        if (response.body.code === 0) {
+          window.location.href = window.location.href
+        } else if (response.body.code === -2007) {
+          window.location.href = window.location.href
+        } else {
+          _this.dialogType = 'dialogbar'
+          _this.dialogRank = 'notice'
+          _this.dialogHtml = response.body.message || '手动确认有误'
         }
+      }, (errResponse) => {
+        this.isloading = false
+        console.log(errResponse)
       })
     },
     detailBillEvent (datas) { // detail bill
+      this.isloading = true
       this.commonFormReq({
-        apiurl: 'http://financial-checking.heyi.test/statement/detailInfo?billId=',
+        apiurl: 'http://financial.manage.youku.com/statement/detailInfo?billId=' + this.billid,
         _params: {jsonp: 'jsoncallback', params: datas},
         callbackFun (res) {
-          if (res.code === 0) {
+          if (res.code === 0) { // 获取成功
             _this.billDetailList = res.data.dataList
             _this.detailTotal = res.data.totalCount
             console.log('对账详情表:' + res.data)
+          } else if (res.code === -2007) { // 登录超时
+            window.location.href = window.location.href
+          } else if (res.code === -6) { // 无法获取数据为空
+            _this.billDetailList = []
+            _this.detailTotal = 0
+          } else { // 无法获取信息提示
+            _this.isShowthis = true
+            _this.dialogType = 'dialogbar'
+            _this.dialogRank = 'notice'
+            _this.dialogHtml = res.message || '查询有误'
           }
+          _this.isloading = false
         }
       })
     },
     detailBillOverview () { // detail bill overview
       this.commonFormReq({
-        apiurl: 'http://financial-checking.heyi.test/statement/detailInfoStatistics?billId=',
+        apiurl: 'http://financial.manage.youku.com/statement/detailInfoStatistics?billId=' + this.billid,
         _params: {jsonp: 'jsoncallback'},
         callbackFun (res) {
           if (res.code === 0) {
@@ -113,7 +139,7 @@ new Vue({
     },
     detialUncheckEvent (datas) { // detial uncheck
       this.commonFormReq({
-        apiurl: 'http://financial-checking.heyi.test/statement/uncheckInfo?billId=',
+        apiurl: 'http://financial.manage.youku.com/statement/uncheckInfo?billId=' + this.billid,
         _params: {jsonp: 'jsoncallback', params: datas},
         callbackFun (res) {
           if (res.code === 0) {
@@ -127,7 +153,7 @@ new Vue({
     },
     detialUncheckOverview () { // detial uncheck overview
       this.commonFormReq({
-        apiurl: 'http://financial-checking.heyi.test/statement/uncheckInfoStatistics?billId=',
+        apiurl: 'http://financial.manage.youku.com/statement/uncheckInfoStatistics?billId=' + this.billid,
         _params: {jsonp: 'jsoncallback'},
         callbackFun (res) {
           if (res.code === 0) {
@@ -140,10 +166,11 @@ new Vue({
       })
     },
     commonFormReq (paramsObj) {
-      this.$http.jsonp(paramsObj.apiurl + this.billid, paramsObj._params).then((response) => {
+      this.$http.jsonp(paramsObj.apiurl, paramsObj._params).then((response) => {
         // console.log(response.body.data)
         paramsObj.callbackFun(response.body)
       }, (errResponse) => {
+        this.isloading = false
         console.log(errResponse)
       })
     },
@@ -151,9 +178,11 @@ new Vue({
       this.isShowthis = false
       // window.location.href = window.location.href
     },
-    handComfirmEvent () {
+    handComfirmEvent (item) {
       this.isShowthis = true
       this.dialogType = 'handlebar'
+      this.itemId = item.id
+      this.itemType = item.type
     },
     checkDetailTab () {
       this.ischeckDetailTab = true
@@ -186,7 +215,7 @@ new Vue({
     logoutReq () {
       if (this.canlgout) {
         this.canlgout = false
-        this.$http.jsonp('http://financial-checking.heyi.test/user/logout', {jsonp: 'jsoncallback'}).then((response) => {
+        this.$http.jsonp('http://financial.manage.youku.com/user/logout', {jsonp: 'jsoncallback'}).then((response) => {
           // console.log(response.body.data)
           this.canlgout = true
           if (response.body.code === 0) {

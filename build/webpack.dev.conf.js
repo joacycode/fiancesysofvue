@@ -6,14 +6,12 @@ var merge = require('webpack-merge')
 var baseWebpackConfig = require('./webpack.base.conf')
 var HtmlWebpackPlugin = require('html-webpack-plugin')
 var FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin')
-
 var glob = require('glob');
 var pages = getEntry('./src/module/**/*.html');
 
 function getEntry(globPath) {
   var entries = {},
     basename, tmp, pathname;
-
   glob.sync(globPath).forEach(function (entry) {
     basename = path.basename(entry, path.extname(entry));
     tmp = entry.split('/').splice(-3);
@@ -23,12 +21,6 @@ function getEntry(globPath) {
   console.log(entries);
   return entries;
 }
-
-
-// add hot-reload related code to entry chunks
-Object.keys(baseWebpackConfig.entry).forEach(function (name) {
-  baseWebpackConfig.entry[name] = ['./build/dev-client'].concat(baseWebpackConfig.entry[name])
-})
 
 module.exports = merge(baseWebpackConfig, {
   module: {
@@ -44,16 +36,14 @@ module.exports = merge(baseWebpackConfig, {
     new webpack.optimize.OccurrenceOrderPlugin(),
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NoEmitOnErrorsPlugin(),
-    // https://github.com/ampedandwired/html-webpack-plugin
-    // new HtmlWebpackPlugin({
-    //   filename: 'index.html',
-    //   template: 'index.html',
-    //   inject: true
-    // }),
     new FriendlyErrorsPlugin()
   ]
 })
 
+// add hot-reload related code to entry chunks
+Object.keys(baseWebpackConfig.entry).forEach(function (name) {
+  baseWebpackConfig.entry[name] = ['./build/dev-client'].concat(baseWebpackConfig.entry[name])
+})
 
 for (var pathname in pages) {
   // 配置生成的html文件，定义路径等
@@ -66,3 +56,4 @@ for (var pathname in pages) {
   // 需要生成几个html文件，就配置几个HtmlWebpackPlugin对象
   module.exports.plugins.push(new HtmlWebpackPlugin(conf));
 }
+

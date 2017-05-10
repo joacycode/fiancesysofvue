@@ -1,7 +1,6 @@
 require('assets/less/main.less')
 
 import Vue from 'vue'
-import $ from 'jquery'
 import Cookie from 'js-cookie'
 import VueResource from 'vue-resource'
 import Selector from '../../components/selector'
@@ -29,8 +28,7 @@ new Vue({
     checkHasdata: false,
     billSearchNull: false,
     checkSearchNull: false,
-    isTabshow: true,
-    statushow: true,
+    isTabshow: true, // 对账管理账单管理
     byear: '2017',
     bmonth: '01',
     eyear: '2017',
@@ -50,7 +48,7 @@ new Vue({
     billTotal: 0,
     checkTotal: 0,
     pageSize: 10,
-    combinelist: [],
+    combinelists: [],
     allListArray: [],
     isCombineShow: false,
     uploadCombinelList: []
@@ -63,37 +61,46 @@ new Vue({
       return this.transformData(this.resultListCheck)
     },
     isListNull () {
-      return !this.combinelist.length
+      return !this.combinelists.length
     },
     saveBillCondition () {
-      return {byear: '', bmonth: '', eyear: '', emonth: '', billStatus: '', channel: '', accountName: '', combinelist: ''}
+      return {byear: '', bmonth: '', eyear: '', emonth: '', billStatus: '', channel: '', accountName: '', comblist: []}
     },
     saveCheckCondition () {
-      return {byear: '2017', bmonth: '01', eyear: '2017', emonth: '01', billStatus: '-2', channel: '-2', accountName: '', combinelist: this.allListArray[0]}
+      return {byear: '2017', bmonth: '01', eyear: '2017', emonth: '01', billStatus: '-2', channel: '-2', accountName: '', comblist: this.allListArray[0] || []}
     },
     getFormsUrl () {
-      return this.isTabshow ? 'http://financial-checking.heyi.test/bill/selectBillInfoByPage' : 'http://financial-checking.heyi.test/bill/selectBillStatementByPage'
+      return this.isTabshow ? 'http://financial.manage.youku.com/bill/selectBillInfoByPage' : 'http://financial.manage.youku.com/bill/selectBillStatementByPage'
     }
   },
   methods: {
     searchResultEvent () { // 账单和对账表查询
-      this.getBilldata({
-        billStatus: this.billStatus,
-        startTime: Number(this.byear + this.bmonth),
-        endTime: Number(this.eyear + this.emonth),
-        channel: this.channel,
-        accountName: this.accountName,
-        pageNo: 1,
-        pageSize: this.pageSize
-      }, this.getFormsUrl)
+      if (this.byear <= this.eyear) { // 月份始末对比过滤
+        if (this.bmonth <= this.emonth) {
+          this.getBilldata({
+            billStatus: this.billStatus,
+            startTime: Number(this.byear + this.bmonth),
+            endTime: Number(this.eyear + this.emonth),
+            channel: this.channel,
+            accountName: this.accountName,
+            pageNo: 1,
+            pageSize: this.pageSize
+          }, this.getFormsUrl)
+        } else {
+          this.isShowthis = true
+          this.dialogType = 'dialogbar'
+          this.dialogRank = 'warn'
+          this.dialogHtml = '同年结束月份不能小于开始月份'
+        }
+      } else {
+        this.isShowthis = true
+        this.dialogType = 'dialogbar'
+        this.dialogRank = 'warn'
+        this.dialogHtml = '结束年份不能小于开始年份'
+      }
     },
     billTabEvent () { // 账单tab
       if (!this.isTabshow) {
-        $(document)
-        .find('.selectPicker .defaultVal')
-        .removeClass('hashow')
-        .siblings('ul')
-        .slideUp('fast')
         this.isTabshow = true
         this.saveCheckCondition['byear'] = this.byear
         this.saveCheckCondition['bmonth'] = this.bmonth
@@ -102,7 +109,7 @@ new Vue({
         this.saveCheckCondition['billStatus'] = this.billStatus
         this.saveCheckCondition['channel'] = this.channel
         this.saveCheckCondition['accountName'] = this.accountName
-        this.saveCheckCondition['combinelist'] = this.combinelist
+        this.saveCheckCondition['comblist'] = this.combinelists
         this.byear = this.saveBillCondition['byear']
         this.bmonth = this.saveBillCondition['bmonth']
         this.eyear = this.saveBillCondition['eyear']
@@ -110,16 +117,11 @@ new Vue({
         this.billStatus = this.saveBillCondition['billStatus']
         this.channel = this.saveBillCondition['channel']
         this.accountName = this.saveBillCondition['accountName']
-        this.combinelist = this.saveBillCondition['combinelist']
+        this.combinelists = this.saveBillCondition['comblist']
       }
     },
     checkTabEvent () { // 对账tab
       if (this.isTabshow) {
-        $(document)
-        .find('.selectPicker .defaultVal')
-        .removeClass('hashow')
-        .siblings('ul')
-        .slideUp('fast')
         this.isTabshow = false
         this.saveBillCondition['byear'] = this.byear
         this.saveBillCondition['bmonth'] = this.bmonth
@@ -128,7 +130,7 @@ new Vue({
         this.saveBillCondition['billStatus'] = this.billStatus
         this.saveBillCondition['channel'] = this.channel
         this.saveBillCondition['accountName'] = this.accountName
-        this.saveBillCondition['combinelist'] = this.combinelist
+        this.saveBillCondition['comblist'] = this.combinelists
         this.byear = this.saveCheckCondition['byear']
         this.bmonth = this.saveCheckCondition['bmonth']
         this.eyear = this.saveCheckCondition['eyear']
@@ -136,7 +138,7 @@ new Vue({
         this.billStatus = this.saveCheckCondition['billStatus']
         this.channel = this.saveCheckCondition['channel']
         this.accountName = this.saveCheckCondition['accountName']
-        this.combinelist = this.saveCheckCondition['combinelist']
+        this.combinelists = this.saveCheckCondition['comblist']
       }
     },
     getNewPageEvent (current) { // 分页页面请求
@@ -170,14 +172,14 @@ new Vue({
         case 'channel':
           this.channel = n
           this.accountName = ''
-          if (n === '1') {
-            this.combinelist = this.allListArray[1]
-          } else if (n === '2') {
-            this.combinelist = this.allListArray[2]
-          } else if (n === '3') {
-            this.combinelist = this.allListArray[3]
+          if (n === 1) {
+            this.combinelists = this.allListArray[1]
+          } else if (n === 2) {
+            this.combinelists = this.allListArray[2]
+          } else if (n === 3) {
+            this.combinelists = this.allListArray[3]
           } else {
-            this.combinelist = this.allListArray[0]
+            this.combinelists = this.allListArray[0]
           }
           break
         default: return
@@ -201,7 +203,7 @@ new Vue({
       // window.location.href = window.location.href
     },
     toUploadEvent (paramsObj) { // 上传确认
-      this.$http.jsonp('http://financial-checking.heyi.test/bill/addBill', {jsonp: 'jsoncallback', params: paramsObj}).then((response) => {
+      this.$http.jsonp('http://financial.manage.youku.com/bill/addBill', {jsonp: 'jsoncallback', params: paramsObj}).then((response) => {
         // console.log(response.body.data)
         this.dialogType = 'dialogbar'
         if (response.body.code !== 0) {
@@ -212,21 +214,20 @@ new Vue({
           // this.dialogType = 'progressbar'
           this.dialogType = 'dialogbar'
           this.dialogRank = 'success'
-          this.dialogHtml = '上传成功'
+          this.dialogHtml = '账单上传中，请确认后刷新页面'
         }
       }, (errResponse) => {
         console.log(errResponse)
       })
     },
     startCheckBtn (id) { // 开始对账
-      this.checkBtnRequst({apiurl: 'http://financial-checking.heyi.test/bill/startCheck?id=', apiid: id})
+      this.checkBtnRequst({apiurl: 'http://financial.manage.youku.com/bill/startCheck?id=', apiid: id})
     },
     confirmCheckBtn (id) { // 确认对账
-      this.checkBtnRequst({apiurl: 'http://financial-checking.heyi.test/statement/confirm?id=', apiid: id})
+      this.checkBtnRequst({apiurl: 'http://financial.manage.youku.com/statement/confirm?id=', apiid: id})
     },
     getBilldata (paramsObj, _url) { // 获取账单和对账表方法
       this.$http.jsonp(_url, {jsonp: 'jsoncallback', params: paramsObj}).then((response) => {
-        // console.log(response.body.data)
         if (response.body.code === 0) {
           if (this.isTabshow) {
             this.billHasdata = true
@@ -278,7 +279,6 @@ new Vue({
     },
     checkBtnRequst (paramsObj) { // 对账api
       this.$http.jsonp(paramsObj.apiurl + paramsObj.apiid, {jsonp: 'jsoncallback'}).then((response) => {
-        console.log(response)
         if (response.body.code === 0) {
           this.isShowthis = true
           this.dialogType = 'dialogbar'
@@ -309,12 +309,12 @@ new Vue({
     },
     receiveListEvent (arraylist) { // 接受联想数据
       this.allListArray = arraylist
-      this.combinelist = this.allListArray[0]
+      this.combinelists = this.allListArray[0]
     },
     logoutReq () { // 登出
       if (this.canlgout) {
         this.canlgout = false
-        this.$http.jsonp('http://financial-checking.heyi.test/user/logout', {jsonp: 'jsoncallback'}).then((response) => {
+        this.$http.jsonp('http://financial.manage.youku.com/user/logout', {jsonp: 'jsoncallback'}).then((response) => {
           // console.log(response.body.data)
           this.canlgout = true
           if (response.body.code === 0) {

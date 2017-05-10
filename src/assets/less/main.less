@@ -144,10 +144,10 @@ a{color: #30A4FF;}
 	.s-w-r{
 		width: 1030px;padding:20px;padding-bottom:137px;background: #fff;float: left;
 		.searchCondition{
-			padding: 20px;background: #FAFAFA;border: 1px solid #E1E1E1;
-			& > ul{
-				width: 764px;float: left;margin-bottom: -15px;
-				& > li{
+			padding: 20px;background: #FAFAFA;border: 1px solid #E1E1E1;position: relative;
+			&>ul{
+				float: left;margin-bottom: -15px;
+				&>li{
 					float: left;margin-bottom: 15px;line-height: 28px;
 					label{width: 62px;margin-right: 10px;float: left;}
 					select,input{height: 28px;line-height: 28px;border: 1px solid #ccc;border-radius: 2px;background: #fff;}
@@ -170,12 +170,12 @@ a{color: #30A4FF;}
 				}
 			}
 			.searchBtn{
+				position: absolute;top: 42px;right: 45px;
 				span{	
 					width: 82px;height: 28px;line-height: 28px;color: #666;text-align: center;cursor: pointer;display: inline-block;
 					background: #F5F5F5;
 					border: 1px solid #CCCCCC;
 					border-radius: 2px;
-					margin: 16px 0 0 64px;
 					&:hover{background: #eee;}
 				}
 			}
@@ -225,7 +225,7 @@ a{color: #30A4FF;}
 		.close{.ico-loginclo;float: right;margin-top: 15px;cursor: pointer;}
 	}
 	.middler{
-		width: 90%;height: 135px;text-align: center;padding-top: 45px;font-size: 16px;font-weight: bold;margin:0 auto;
+		width: 90%;height: 135px;text-align: center;padding-top: 45px;font-size: 16px;margin:0 auto;
 		.ico{vertical-align: middle;margin-right: 10px;}
 		&.success{
 			.ico{.ico-success;}

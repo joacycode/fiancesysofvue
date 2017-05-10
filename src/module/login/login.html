@@ -20,7 +20,7 @@
                 <p>账户登录</p>
                 <div class="loginError">{{errorMsg}}</div>
                 <div class="formin account"><input  type="txt" name="account" placeholder="登录名"  v-model="accountVal"></div>
-                <div class="formin password"><input type="password" name="pwd" placeholder="请输入密码" :value="pwdVal"  v-model="pwdVal"></div>
+                <div class="formin password"><input type="password" name="pwd" placeholder="请输入密码" :value="pwdVal"  v-model="pwdVal" @keyup.enter="logininEvent"></div>
                 <div class="submitBtn"><span onselectstart="return false;" @click="logininEvent">登录</span></div>
             </div>
         </div>

@@ -47,7 +47,7 @@
                         </li>
                         <li class="s-payway clearfix mr20 selectorWrap" v-show="isTabshow">
                             <label>支付渠道:</label>
-                             <selector class="selectStyc" default-html="全部" :default-val="channel" select-type="channel" select-mean="channel" need-total="yes" Bo @chooseopt="handledata" @sendlists="receiveListEvent"></selector>
+                             <selector class="selectStyb" default-html="全部" :default-val="channel" select-type="channel" select-mean="channel" need-total="yes" Bo @chooseopt="handledata" @sendlists="receiveListEvent"></selector>
                         </li>
                         <li class="s-account clearfix">
                             <label>支付账号:</label>
@@ -55,7 +55,7 @@
                             <div class="combineResWrap" v-show="isCombineShow">
                                 <p v-if="isListNull">未找到匹配结果</p>
                                 <ul v-else>
-                                    <li v-for="item in combinelist" @mousedown="combineItemEvent">{{item}}</li>
+                                    <li v-for="item in combinelists" @mousedown="combineItemEvent">{{item}}</li>
                                 </ul>
                             </div>
                         </li>
@@ -75,7 +75,7 @@
                         </li>
                         <li class="s-payway clearfix mr20 selectorWrap">
                             <label>支付渠道:</label>
-                             <selector class="selectStyc" default-html="全部" :default-val="channel" select-type="channel" select-mean="channel" need-total="yes" @chooseopt="handledata" @sendlists="receiveListEvent"></selector>
+                             <selector class="selectStyb" default-html="全部" :default-val="channel" select-type="channel" select-mean="channel" need-total="yes" @chooseopt="handledata" @sendlists="receiveListEvent"></selector>
                         </li>
                         <li class="s-account clearfix">
                             <label>支付账号:</label>
@@ -83,7 +83,7 @@
                             <div class="combineResWrap" v-show="isCombineShow">
                                 <p v-if="isListNull">未找到匹配结果</p>
                                 <ul v-else>
-                                    <li v-for="item in combinelist" @mousedown="combineItemEvent">{{item}}</li>
+                                    <li v-for="item in combinelists" @mousedown="combineItemEvent">{{item}}</li>
                                 </ul>
                             </div>
                         </li>

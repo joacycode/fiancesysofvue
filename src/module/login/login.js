@@ -1,8 +1,10 @@
+require('assets/less/main.less')
 import Vue from 'vue'
-import $ from 'jquery'
+import VueResource from 'vue-resource'
 import Cookie from 'js-cookie'
 import Md5 from 'md5'
-require('assets/less/main.less')
+
+Vue.use(VueResource)
 /* eslint-disable no-new */
 new Vue({
   el: '#loginPage',
@@ -32,29 +34,21 @@ new Vue({
         })
       }
     },
-    loginReq: function (params) {
-      $.ajax({
-        url: 'http://financial-checking.heyi.test/user/login',
-        type: 'GET',
-        dataType: 'jsonp',
-        jsonp: 'jsoncallback',
-        jsonpCallback: 'getData',
-        data: decodeURIComponent($.param(params))
-      })
-      .done((res) => {
+    loginReq: function (paramsObj) {
+      this.$http.jsonp('http://financial.manage.youku.com/user/login', {jsonp: 'jsoncallback', params: paramsObj}).then((response) => {
         this.canlogin = true
-        if (res.code === 0) {
+        if (response.body.code === 0) {
           Cookie.set('loginSure', this.accountVal)
           window.location.href = '/module/index.html'
         } else {
-          this.errorMsg = res.message || '登录失败'
+          this.errorMsg = response.body.message || '登录失败'
         }
-      })
-      .fail(() => {
+      }, (response) => {
         this.canlogin = true
         this.errorMsg = '请求错误，稍后再试'
       })
     }
+
   }
 })
 

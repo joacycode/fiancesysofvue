@@ -57,10 +57,10 @@
                 </div>
             </div>
             <div class="formitem selectorWrap">
-              <span>账单年月</span> <selector class="selector mr10 " default-html="2017年" :default-val="year" select-type="year" select-mean="year" @chooseopt="handledata"></selector><selector class="selector" default-html="1月" :default-val="month" select-type="month" select-mean="month" @chooseopt="handledata"></selector>
+              <span>账单年月</span> <selector class="selector mr20 " default-html="2017年" :default-val="year" select-type="year" select-mean="year" @chooseopt="handledata"></selector><selector class="selector" default-html="1月" :default-val="month" select-type="month" select-mean="month" @chooseopt="handledata"></selector>
             </div>
             <div class="formitem">
-              <span>账单地址</span><input type="text" class="ty_long" v-model="uploadAdress" :class="{blanknull:isAdressNull}">
+              <span>账单名称</span><input type="text" class="ty_long" v-model="uploadAdress" :class="{blanknull:isAdressNull}">
             </div>
           </div>  
           <span class="makeSure mt35" @click="uploadEvent">立即上传</span>
@@ -76,7 +76,7 @@
             <textarea placeholder="必填" @keyup="countEvent" @input="countEvent" v-model="handlebarVal" :class="{blanknull:isTextareaNull}"></textarea>
           </div>
           <div class="mutiBtns mt35">
-            <span class="makeSure mr20" @click="handTypeEventsure">确认  
+            <span class="makeSure mr20" @click="handTypeEventsure">确认
             </span><span class="cancel" @click="handTypeEventcancel">取消</span>
           </div>
         </div>
@@ -189,11 +189,11 @@ export default {
         case 'channel':
           this.channel = n
           this.uploadAccount = ''
-          if (n === '1') {
+          if (n === 1) {
             this.combinelist = this.uploadArray[1]
-          } else if (n === '2') {
+          } else if (n === 2) {
             this.combinelist = this.uploadArray[2]
-          } else if (n === '3') {
+          } else if (n === 3) {
             this.combinelist = this.uploadArray[3]
           }
           console.log(this.combinelist)
