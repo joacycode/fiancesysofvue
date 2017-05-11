@@ -17,7 +17,7 @@ export default {
     return {
       getShowhtml: '',
       sendBackval: '',
-      channels: '',
+      channels: [],
       allListArray: [],
       isDownShow: false
     }
@@ -59,17 +59,19 @@ export default {
     if (this.selectType === 'channel') { // 动态请求列表的数据
       this.$http.jsonp('http://financial.manage.youku.com/account/getAllAcount', {jsonp: 'jsoncallback'}).then((response) => {
         // console.log(response.body.data)
-        let listTotal = [] // listTotal  Array
-        let newData = response.body.data
-        for (let item of newData) {
-          listTotal = listTotal.concat(item.accountList)
-          this.allListArray.push(item.accountList)
+        if (response.body.code === 0) {
+          let listTotal = [] // listTotal  Array
+          let newDataArr = response.body.data
+          for (let item of newDataArr) {
+            listTotal = listTotal.concat(item.accountList)
+            this.allListArray.push(item.accountList)
+          }
+          if (this.needTotal === 'yes') { // 需要显示全部渠道账单
+            newDataArr.unshift({id: -2, name: '全部', accountList: listTotal})
+            this.allListArray.unshift(listTotal) // all accountList Array
+          }
+          this.channels.splice(0, 0, ...newDataArr) // 动态增加新数据
         }
-        if (this.needTotal === 'yes') { // 需要显示全部渠道账单
-          newData.unshift({id: -2, name: '全部', accountList: listTotal})
-          this.allListArray.unshift(listTotal) // all accountList Array
-        }
-        this.channels = newData
       }, (errResponse) => {
         console.log(errResponse)
       })

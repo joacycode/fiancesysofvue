@@ -4,24 +4,15 @@
     <meta charset="UTF-8">
     <title>财务对账系统</title>
     <link rel="shortcut icon"  href="/favicon.ico" type="image/x-icon">
+    <style>
+        [v-cloak] {
+          display: none;
+        }
+    </style>
 </head>
 <body>
-    <div id="indexPage">
-        <div class="header">
-            <div class="head-top">
-                <div class="lg-info">
-                    <span class="exit" @click="logoutReq">退出</span>
-                    <span>欢迎您,<b>{{loginName}}</b></span>
-                </div>
-            </div>
-            <div class="head-bot">
-                <ul>
-                    <li class="yklogo"><span></span></li>
-                    <li class="tit">财务对账系统</li>
-                    <li id="uploadfile"><span onselectstart="return false;" @click="uploadsth">上传账单</span></li>
-                </ul>
-            </div>
-        </div>
+    <div id="indexPage" v-cloak>
+        <headwrap title="财务对账系统" :need-upload="true" :need-logfoo="true" @uploadbill="uploadsth"></headwrap>
         <div class="side-wrapper">
             <div class="s-w-l">
                 <ul>
@@ -116,7 +107,7 @@
                                     <td class="w90 hlight"><p v-if="item.billStatus === 1">对账中</p><p class="c00C651" v-else-if="item.billStatus === 2">对账通过</p><p v-else-if="item.billStatus === 3">对账未通过</p><p class="c666" v-else-if="item.billStatus === 4">已确认</p><p v-else-if="item.billStatus === -1">对账失败</p><p v-else-if="item.billStatus === 0">未对账</p></td>
                                     <td class="w90">{{item.operator}}</td>
                                     <td class="w160">{{item.unixTime}}</td>
-                                    <td class="w150 operatecheck"><span  v-if="item.billStatus === 0 || item.billStatus === -1 || item.billStatus === 3" @click="startCheckBtn(item.id)">对账</span></td>
+                                    <td class="w150 operatecheck"><span  v-if="item.billStatus === 0 || item.billStatus === -1" @click="startCheckBtn(item.id)">对账</span></td>
                                 </tr>
                             </table>
                             <pagination v-if="billTotal > 0" @getnewpage="getNewPageEvent" :total-items="billTotal" :page-size="pageSize"></pagination>

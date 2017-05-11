@@ -4,23 +4,15 @@
   <meta charset="UTF-8">
   <title>账单详情</title>
   <link rel="shortcut icon"  href="/favicon.ico" type="image/x-icon">
+  <style>
+    [v-cloak] {
+      display: none;
+    }
+  </style>
 </head>
 <body>
-  <div id="detailPage">
-    <div class="header">
-        <div class="head-top">
-            <div class="lg-info">
-                <span class="exit" @click="logoutReq">退出</span>
-                <span>欢迎您,<b>{{loginName}}</b></span>
-            </div>
-        </div>
-        <div class="head-bot">
-            <ul>
-                <li class="yklogo"><span></span></li>
-                <li class="tit">财务对账系统</li>
-            </ul>
-        </div>
-    </div>
+  <div id="detailPage" v-cloak>
+    <headwrap title="对账详情" :need-upload="false" :need-logfoo="true"></headwrap>
     <div class="detail-wrapper">
       <ul class="infOfdetail clearfix">
         <li>对账信息：</li>
@@ -50,7 +42,7 @@
               <th>收入金额(元)</th>
               <th>支出金额(元)</th>
               <th>业务类型</th>
-              <th class="w180"><selector class="selectStyc" select-type="verify" default-html="核对结果" :default-val="verifyVal"  select-mean="verify" @chooseopt="handledata"></selector></th>
+              <th class="w180"><selector class="selectStyc" select-type="verify" default-html="核对结果" :default-val="verifyRes"  select-mean="verify" @chooseopt="handledata"></selector></th>
               <th class="w300">操作</th>
             </tr>
             <tr v-for="item in billDetailList">

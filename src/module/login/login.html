@@ -4,19 +4,17 @@
   <meta charset="UTF-8">
   <title>登录</title>
   <link rel="shortcut icon"  href="/favicon.ico" type="image/x-icon">
+  <style>
+    [v-cloak] {
+      display: none;
+    }
+  </style>
 </head>
 <body>
     <div id="loginPage">
-      <div class="header">
-        <div class="head-bot">
-            <ul>
-                <li class="yklogo"><span></span></li>
-                <li class="tit">财务对账系统</li>
-            </ul>
-        </div>
-        </div>
+        <headwrap title="财务对账系统" :need-upload="false" :need-logfoo="false"></headwrap>
         <div class="loginMidWrap">
-            <div class="loginFrame">
+            <div class="loginFrame" v-cloak>
                 <p>账户登录</p>
                 <div class="loginError">{{errorMsg}}</div>
                 <div class="formin account"><input  type="txt" name="account" placeholder="登录名"  v-model="accountVal"></div>

@@ -3,11 +3,15 @@ import Vue from 'vue'
 import VueResource from 'vue-resource'
 import Cookie from 'js-cookie'
 import Md5 from 'md5'
+import Headwrap from '../../components/headwrap'
 
 Vue.use(VueResource)
 /* eslint-disable no-new */
 new Vue({
   el: '#loginPage',
+  components: {
+    'headwrap': Headwrap
+  },
   data: {
     canlogin: true,
     accountVal: '',

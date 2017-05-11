@@ -7,6 +7,7 @@ import Loadiner from '../../components/loadiner'
 import Selector from '../../components/selector'
 import Pagination from '../../components/pagination'
 import Dialogpop from '../../components/dialogpop'
+import Headwrap from '../../components/headwrap'
 import store from '../../assets/js/store/index'
 
 Vue.use(VueResource)
@@ -42,10 +43,9 @@ new Vue({
     uncheckTotal: 0,
     pageSize: 20,
     hasUncheckTab: false,
-    verifyVal: '',
-    curUncheckPage: 1,
-    curBillPage: 1,
+    verifyRes: -2,
     isloading: false,
+    canShowLoading: false, // 未核对订单加载进来第一次请求不出现loading，分页时候改变为ture才显示loading等待
     itemId: '',
     itemType: ''
   },
@@ -58,7 +58,8 @@ new Vue({
     'dialogpop': Dialogpop,
     'pagination': Pagination,
     'selector': Selector,
-    'loadiner': Loadiner
+    'loadiner': Loadiner,
+    'headwrap': Headwrap
   },
   mounted () {
     let ref = window.location.search
@@ -107,13 +108,13 @@ new Vue({
           if (res.code === 0) { // 获取成功
             _this.billDetailList = res.data.dataList
             _this.detailTotal = res.data.totalCount
-            console.log('对账详情表:' + res.data)
           } else if (res.code === -2007) { // 登录超时
             window.location.href = window.location.href
           } else if (res.code === -6) { // 无法获取数据为空
             _this.billDetailList = []
             _this.detailTotal = 0
           } else { // 无法获取信息提示
+            _this.isloading = false // 提示信息之前消除loading
             _this.isShowthis = true
             _this.dialogType = 'dialogbar'
             _this.dialogRank = 'notice'
@@ -138,6 +139,7 @@ new Vue({
       })
     },
     detialUncheckEvent (datas) { // detial uncheck
+      if (this.canShowLoading) { this.isloading = true }
       this.commonFormReq({
         apiurl: 'http://financial.manage.youku.com/statement/uncheckInfo?billId=' + this.billid,
         _params: {jsonp: 'jsoncallback', params: datas},
@@ -146,8 +148,21 @@ new Vue({
             _this.hasUncheckTab = true // 显示出未核对tab
             _this.unCheckedList = res.data.dataList
             _this.uncheckTotal = res.data.totalCount
-            console.log('未核对订单表:' + res.data)
+          } else if (res.code === -2007) { // 登录超时
+            window.location.href = window.location.href
+          } else if (res.code === -6) { // 无法获取数据为空
+            _this.unCheckedList = []
+            _this.uncheckTotal = 0
+          } else { // 无法获取信息提示
+            if (this.canShowLoading) {
+              this.isloading = false
+              _this.isShowthis = true
+              _this.dialogType = 'dialogbar'
+              _this.dialogRank = 'notice'
+              _this.dialogHtml = res.message || '查询有误'
+            }
           }
+          if (this.canShowLoading) { this.isloading = false }
         }
       })
     },
@@ -190,42 +205,21 @@ new Vue({
     uncheckedTab () {
       this.ischeckDetailTab = false
     },
-    getBillNewPage (current) {
-      this.curBillPage = current
-      this.detailBillOverview()
-      this.detailBillEvent({pageSize: this.pageSize, pageNo: current})
+    getBillNewPage (current) { // 分页获取详情数据
+      this.detailBillEvent({pageSize: this.pageSize, pageNo: current, verifyResult: this.verifyRes})
     },
-    getUncheckNewPage (current) {
-      this.curUncheckPage = current
-      this.detialUncheckOverview()
+    getUncheckNewPage (current) { // 分页获取未核对数据
+      this.canShowLoading = true
       this.detialUncheckEvent({pageSize: this.pageSize, pageNo: current})
     },
-    handledata (m, n) {
+    handledata (m, n) { // 核对条件筛选 一致|不一致|全部
       if (m === 'verify' && n !== '') {
-        this.verifyVal = n
+        this.verifyRes = n
         if (this.ischeckDetailTab) {
-          this.detailBillOverview()
-          this.detailBillEvent({pageSize: this.pageSize, pageNo: this.curBillPage, verifyResult: this.verifyVal})
+          this.detailBillEvent({pageSize: this.pageSize, pageNo: 1, verifyResult: this.verifyRes})
         } else {
-          this.detialUncheckOverview()
-          this.detialUncheckEvent({pageSize: this.pageSize, pageNo: this.curUncheckPage, verifyResult: this.verifyVal})
+          this.detialUncheckEvent({pageSize: this.pageSize, pageNo: 1, verifyResult: this.verifyRes})
         }
-      }
-    },
-    logoutReq () {
-      if (this.canlgout) {
-        this.canlgout = false
-        this.$http.jsonp('http://financial.manage.youku.com/user/logout', {jsonp: 'jsoncallback'}).then((response) => {
-          // console.log(response.body.data)
-          this.canlgout = true
-          if (response.body.code === 0) {
-            Cookie.remove('loginSure')
-            window.location.href = window.location.href
-          }
-        }, (errResponse) => {
-          this.canlgout = true
-          console.log(errResponse)
-        })
       }
     }
 

@@ -1,12 +1,12 @@
 require('assets/less/main.less')
 
 import Vue from 'vue'
-import Cookie from 'js-cookie'
 import VueResource from 'vue-resource'
 import Selector from '../../components/selector'
 import Dialogpop from '../../components/dialogpop'
 import store from '../../assets/js/store/index'
 import Pagination from '../../components/pagination'
+import Headwrap from '../../components/headwrap'
 
 Vue.use(VueResource)
 
@@ -16,7 +16,8 @@ new Vue({
   components: {
     'selector': Selector,
     'dialogpop': Dialogpop,
-    'pagination': Pagination
+    'pagination': Pagination,
+    'headwrap': Headwrap
   },
   el: '#indexPage',
   data: {
@@ -43,15 +44,14 @@ new Vue({
     hasDialogsub: false,  // 是否有sub文字
     dialogHtml: '', // 文字
     dialogHtmlSub: '', // sub文字
-    canlgout: true,
-    loginName: Cookie.get('loginSure'),
     billTotal: 0,
     checkTotal: 0,
     pageSize: 10,
     combinelists: [],
     allListArray: [],
     isCombineShow: false,
-    uploadCombinelList: []
+    uploadCombinelList: [],
+    formRefresh: false
   },
   computed: {
     newResultListBill () { // 统一数据处理新数据
@@ -200,7 +200,10 @@ new Vue({
     closeEvent () { // dialog关闭事件
       this.isShowthis = false
       this.uploadCombinelList = []
-      // window.location.href = window.location.href
+      if (this.formRefresh) { // 条件局部数据刷新
+        this.searchResultEvent()
+        this.formRefresh = false
+      }
     },
     toUploadEvent (paramsObj) { // 上传确认
       this.$http.jsonp('http://financial.manage.youku.com/bill/addBill', {jsonp: 'jsoncallback', params: paramsObj}).then((response) => {
@@ -280,6 +283,7 @@ new Vue({
     checkBtnRequst (paramsObj) { // 对账api
       this.$http.jsonp(paramsObj.apiurl + paramsObj.apiid, {jsonp: 'jsoncallback'}).then((response) => {
         if (response.body.code === 0) {
+          this.formRefresh = true
           this.isShowthis = true
           this.dialogType = 'dialogbar'
           this.dialogRank = 'success'
@@ -310,22 +314,6 @@ new Vue({
     receiveListEvent (arraylist) { // 接受联想数据
       this.allListArray = arraylist
       this.combinelists = this.allListArray[0]
-    },
-    logoutReq () { // 登出
-      if (this.canlgout) {
-        this.canlgout = false
-        this.$http.jsonp('http://financial.manage.youku.com/user/logout', {jsonp: 'jsoncallback'}).then((response) => {
-          // console.log(response.body.data)
-          this.canlgout = true
-          if (response.body.code === 0) {
-            Cookie.remove('loginSure')
-            window.location.href = window.location.href
-          }
-        }, (errResponse) => {
-          this.canlgout = true
-          console.log(errResponse)
-        })
-      }
     }
 
   }
