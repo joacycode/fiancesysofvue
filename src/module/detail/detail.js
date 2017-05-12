@@ -11,7 +11,7 @@ import Headwrap from '../../components/headwrap'
 import store from '../../assets/js/store/index'
 
 Vue.use(VueResource)
-let _this
+let vm
 /* eslint-disable no-new */
 new Vue({
 // router: router,
@@ -47,7 +47,10 @@ new Vue({
     isloading: false,
     canShowLoading: false, // 未核对订单加载进来第一次请求不出现loading，分页时候改变为ture才显示loading等待
     itemId: '',
-    itemType: ''
+    itemType: '',
+    uncheckCurrent: 1,
+    billCurrent: 1,
+    UCOV_FIRSTIN: true
   },
   computed: {
     exporturi () {
@@ -55,22 +58,21 @@ new Vue({
     }
   },
   components: {
-    'dialogpop': Dialogpop,
-    'pagination': Pagination,
-    'selector': Selector,
-    'loadiner': Loadiner,
-    'headwrap': Headwrap
+    'useDialog': Dialogpop,
+    'usePagination': Pagination,
+    'useSelector': Selector,
+    'useLoad': Loadiner,
+    'useHead': Headwrap
   },
   mounted () {
     let ref = window.location.search
     let arr = ref.split('&')
-    _this = this
+    vm = this
     this.billid = arr[0].substring(ref.indexOf('?') + 4)
     this.payChannel = arr[1]
     this.billAccount = arr[2]
     this.billTime = arr[3].substring(0, 4) + '-' + arr[3].substring(4)
     this.detailBillOverview()
-    this.detialUncheckOverview()
     this.detailBillEvent({pageSize: this.pageSize, pageNo: 1})
     this.detialUncheckEvent({pageSize: this.pageSize, pageNo: 1})
   },
@@ -85,14 +87,21 @@ new Vue({
         paramsObj = {id: this.itemId, reason: encodeURI(encodeURI(thisrea)), type: this.itemType}
       }
       this.$http.jsonp(apiurl, {jsonp: 'jsoncallback', params: paramsObj}).then((response) => {
-        if (response.body.code === 0) {
+        if (response.body.code === 0) { // 手动确认成功
+          vm.dialogType = 'dialogbar'
+          vm.dialogRank = 'success'
+          vm.dialogHtml = response.body.message || '手动确认成功'
+          if (vm.ischeckDetailTab) {
+            vm.detailBillEvent({pageSize: vm.pageSize, pageNo: vm.billCurrent, verifyResult: vm.verifyRes}) // 局部刷新数据
+          } else {
+            vm.detialUncheckEvent({pageSize: vm.pageSize, pageNo: vm.uncheckCurrent})
+          }
+        } else if (response.body.code === -2007) { // 登录超时
           window.location.href = window.location.href
-        } else if (response.body.code === -2007) {
-          window.location.href = window.location.href
-        } else {
-          _this.dialogType = 'dialogbar'
-          _this.dialogRank = 'notice'
-          _this.dialogHtml = response.body.message || '手动确认有误'
+        } else { // 手动确认失败
+          vm.dialogType = 'dialogbar'
+          vm.dialogRank = 'notice'
+          vm.dialogHtml = response.body.message || '手动确认有误'
         }
       }, (errResponse) => {
         this.isloading = false
@@ -106,21 +115,21 @@ new Vue({
         _params: {jsonp: 'jsoncallback', params: datas},
         callbackFun (res) {
           if (res.code === 0) { // 获取成功
-            _this.billDetailList = res.data.dataList
-            _this.detailTotal = res.data.totalCount
+            vm.billDetailList = res.data.dataList
+            vm.detailTotal = res.data.totalCount
           } else if (res.code === -2007) { // 登录超时
             window.location.href = window.location.href
           } else if (res.code === -6) { // 无法获取数据为空
-            _this.billDetailList = []
-            _this.detailTotal = 0
+            vm.billDetailList = []
+            vm.detailTotal = 0
           } else { // 无法获取信息提示
-            _this.isloading = false // 提示信息之前消除loading
-            _this.isShowthis = true
-            _this.dialogType = 'dialogbar'
-            _this.dialogRank = 'notice'
-            _this.dialogHtml = res.message || '查询有误'
+            vm.isloading = false // 提示信息之前消除loading
+            vm.isShowthis = true
+            vm.dialogType = 'dialogbar'
+            vm.dialogRank = 'notice'
+            vm.dialogHtml = res.message || '查询有误'
           }
-          _this.isloading = false
+          vm.isloading = false
         }
       })
     },
@@ -131,9 +140,9 @@ new Vue({
         callbackFun (res) {
           if (res.code === 0) {
             console.log('对账数据统计', res.data, res.data.refund, res.data.fee)
-            _this.detialRevenue = res.data.revenue
-            _this.detialRefund = res.data.refund
-            _this.detialFee = res.data.fee
+            vm.detialRevenue = res.data.revenue
+            vm.detialRefund = res.data.refund
+            vm.detialFee = res.data.fee
           }
         }
       })
@@ -145,21 +154,21 @@ new Vue({
         _params: {jsonp: 'jsoncallback', params: datas},
         callbackFun (res) {
           if (res.code === 0) {
-            _this.hasUncheckTab = true // 显示出未核对tab
-            _this.unCheckedList = res.data.dataList
-            _this.uncheckTotal = res.data.totalCount
+            vm.hasUncheckTab = true // 显示出未核对tab
+            vm.unCheckedList = res.data.dataList
+            vm.uncheckTotal = res.data.totalCount
           } else if (res.code === -2007) { // 登录超时
             window.location.href = window.location.href
           } else if (res.code === -6) { // 无法获取数据为空
-            _this.unCheckedList = []
-            _this.uncheckTotal = 0
+            vm.unCheckedList = []
+            vm.uncheckTotal = 0
           } else { // 无法获取信息提示
             if (this.canShowLoading) {
               this.isloading = false
-              _this.isShowthis = true
-              _this.dialogType = 'dialogbar'
-              _this.dialogRank = 'notice'
-              _this.dialogHtml = res.message || '查询有误'
+              vm.isShowthis = true
+              vm.dialogType = 'dialogbar'
+              vm.dialogRank = 'notice'
+              vm.dialogHtml = res.message || '查询有误'
             }
           }
           if (this.canShowLoading) { this.isloading = false }
@@ -173,9 +182,9 @@ new Vue({
         callbackFun (res) {
           if (res.code === 0) {
             console.log('未核对统计', res, res.data.refund, res.data.fee)
-            _this.uncheckedRevenue = res.data.revenue
-            _this.uncheckedRefund = res.data.refund
-            _this.uncheckedFee = res.data.fee
+            vm.uncheckedRevenue = res.data.revenue
+            vm.uncheckedRefund = res.data.refund
+            vm.uncheckedFee = res.data.fee
           }
         }
       })
@@ -204,12 +213,18 @@ new Vue({
     },
     uncheckedTab () {
       this.ischeckDetailTab = false
+      if (this.UCOV_FIRSTIN) {
+        this.UCOV_FIRSTIN = false
+        this.detialUncheckOverview()
+      }
     },
     getBillNewPage (current) { // 分页获取详情数据
+      this.billCurrent = current
       this.detailBillEvent({pageSize: this.pageSize, pageNo: current, verifyResult: this.verifyRes})
     },
     getUncheckNewPage (current) { // 分页获取未核对数据
       this.canShowLoading = true
+      this.uncheckCurrent = current
       this.detialUncheckEvent({pageSize: this.pageSize, pageNo: current})
     },
     handledata (m, n) { // 核对条件筛选 一致|不一致|全部

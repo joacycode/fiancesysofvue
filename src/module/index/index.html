@@ -12,7 +12,7 @@
 </head>
 <body>
     <div id="indexPage" v-cloak>
-        <headwrap title="财务对账系统" :need-upload="true" :need-logfoo="true" @uploadbill="uploadsth"></headwrap>
+        <use-head title="财务对账系统" :need-upload="true" :need-logfoo="true" @uploadbill="uploadsth"></use-head>
         <div class="side-wrapper">
             <div class="s-w-l">
                 <ul>
@@ -25,24 +25,24 @@
                     <ul v-show="isTabshow"><!-- 账单状态 -->
                         <li class="s-time clearfix mr30 selectorWrap">
                             <label>时间:</label>
-                            <selector class="selectStya mr10" default-html="2017年" :default-val="byear" select-type="year" select-mean="byear" @chooseopt="handledata"></selector>
-                            <selector class="selectStya" default-html="1月" default-val="01" select-type="month" select-mean="bmonth" @chooseopt="handledata"></selector>
+                            <use-selector class="selectStya mr10" default-html="2017年" :default-val="byear" select-type="year" select-mean="byear" @chooseopt="handledata"></use-selector>
+                            <use-selector class="selectStya" default-html="1月" default-val="01" select-type="month" select-mean="bmonth" @chooseopt="handledata"></use-selector>
                             <span class="mr5 ml5">-</span>
-                            <selector class="selectStya mr10" default-html="2017年" :default-val="eyear" select-type="year" select-mean="eyear" @chooseopt="handledata"></selector>
-                            <selector class="selectStya" default-html="1月" default-val="01" select-type="month" select-mean="emonth" @chooseopt="handledata"></selector>
+                            <use-selector class="selectStya mr10" default-html="2017年" :default-val="eyear" select-type="year" select-mean="eyear" @chooseopt="handledata"></use-selector>
+                            <use-selector class="selectStya" default-html="1月" default-val="01" select-type="month" select-mean="emonth" @chooseopt="handledata"></use-selector>
                         </li>
                         
                         <li class="s-status clearfix selectorWrap" v-show="isTabshow">
                             <label>账单状态:</label>
-                            <selector class="selectStyc" default-html="全部" :default-val="billStatus" select-type="status" select-mean="billStatus" @chooseopt="handledata"></selector>
+                            <use-selector class="selectStyc" default-html="全部" :default-val="billStatus" select-type="status" select-mean="billStatus" @chooseopt="handledata"></use-selector>
                         </li>
                         <li class="s-payway clearfix mr20 selectorWrap" v-show="isTabshow">
                             <label>支付渠道:</label>
-                             <selector class="selectStyb" default-html="全部" :default-val="channel" select-type="channel" select-mean="channel" need-total="yes" Bo @chooseopt="handledata" @sendlists="receiveListEvent"></selector>
+                             <use-selector class="selectStyb" default-html="全部" :default-val="channel" select-type="channel" select-mean="channel" need-total="yes" Bo @chooseopt="handledata" @sendlists="receiveListEvent"></use-selector>
                         </li>
                         <li class="s-account clearfix">
                             <label>支付账号:</label>
-                            <input type="text" name="account" v-model="accountName" @focus="combineFocus" @blur="combineBlur">
+                            <input type="text" name="account" v-model.trim="accountName" @focus="combineFocus" @blur="combineBlur">
                             <div class="combineResWrap" v-show="isCombineShow">
                                 <p v-if="isListNull">未找到匹配结果</p>
                                 <ul v-else>
@@ -54,23 +54,23 @@
                     <ul v-show="!isTabshow"><!-- 支付渠道 -->
                         <li class="s-time clearfix mr30 selectorWrap">
                             <label>时间:</label>
-                            <selector class="selectStya mr10" default-html="2017年" :default-val="byear" select-type="year" select-mean="byear" @chooseopt="handledata"></selector>
-                            <selector class="selectStya" default-html="1月" default-val="01" select-type="month" select-mean="bmonth" @chooseopt="handledata"></selector>
+                            <use-selector class="selectStya mr10" default-html="2017年" :default-val="byear" select-type="year" select-mean="byear" @chooseopt="handledata"></use-selector>
+                            <use-selector class="selectStya" default-html="1月" default-val="01" select-type="month" select-mean="bmonth" @chooseopt="handledata"></use-selector>
                             <span class="mr5 ml5">-</span>
-                            <selector class="selectStya mr10" default-html="2017年" :default-val="eyear" select-type="year" select-mean="eyear" @chooseopt="handledata"></selector>
-                            <selector class="selectStya" default-html="1月" default-val="01" select-type="month" select-mean="emonth" @chooseopt="handledata"></selector>
+                            <use-selector class="selectStya mr10" default-html="2017年" :default-val="eyear" select-type="year" select-mean="eyear" @chooseopt="handledata"></use-selector>
+                            <use-selector class="selectStya" default-html="1月" default-val="01" select-type="month" select-mean="emonth" @chooseopt="handledata"></use-selector>
                         </li>
                         <li class="s-status clearfix selectorWrap" v-show="!isTabshow">
                             <label>对账状态:</label>
-                             <selector class="selectStyc" default-html="全部" :default-val="billStatus" select-type="status" select-mean="billStatus" @chooseopt="handledata"></selector>
+                             <use-selector class="selectStyc" default-html="全部" :default-val="billStatus" select-type="status" select-mean="billStatus" @chooseopt="handledata"></use-selector>
                         </li>
                         <li class="s-payway clearfix mr20 selectorWrap">
                             <label>支付渠道:</label>
-                             <selector class="selectStyb" default-html="全部" :default-val="channel" select-type="channel" select-mean="channel" need-total="yes" @chooseopt="handledata" @sendlists="receiveListEvent"></selector>
+                             <use-selector class="selectStyb" default-html="全部" :default-val="channel" select-type="channel" select-mean="channel" need-total="yes" @chooseopt="handledata" @sendlists="receiveListEvent"></use-selector>
                         </li>
                         <li class="s-account clearfix">
                             <label>支付账号:</label>
-                            <input type="text" name="account" v-model="accountName" @focus="combineFocus" @blur="combineBlur">
+                            <input type="text" name="account" v-model.trim="accountName" @focus="combineFocus" @blur="combineBlur">
                             <div class="combineResWrap" v-show="isCombineShow">
                                 <p v-if="isListNull">未找到匹配结果</p>
                                 <ul v-else>
@@ -110,7 +110,7 @@
                                     <td class="w150 operatecheck"><span  v-if="item.billStatus === 0 || item.billStatus === -1" @click="startCheckBtn(item.id)">对账</span></td>
                                 </tr>
                             </table>
-                            <pagination v-if="billTotal > 0" @getnewpage="getNewPageEvent" :total-items="billTotal" :page-size="pageSize"></pagination>
+                            <use-pagination v-if="billTotal > 0" @getnewpage="getNewPageEvent" :total-items="billTotal" :page-size="pageSize"></use-pagination>
                         </div>
                         <!-- 无结果 -->
                         <div class="resOfnone" v-show="!billHasdata && billSearchNull">
@@ -143,7 +143,7 @@
                                     <td class="w150 operatecheck"><a :href="'/module/detail.html?id=' + item.id + '&' + item.channel + '&' + item.accountName + '&' + item.billTime" target="_blank">详情</a><span v-if="item.billStatus !== 4" @click="confirmCheckBtn(item.id)">确认对账</span></td>
                                 </tr>
                             </table>
-                            <pagination v-if="checkTotal > 0" @getnewpage="getNewPageEvent" :total-items="checkTotal" :page-size="pageSize"></pagination>
+                            <use-pagination v-if="checkTotal > 0" @getnewpage="getNewPageEvent" :total-items="checkTotal" :page-size="pageSize"></use-pagination>
                         </div>
                         <!-- 无结果 -->
                         <div class="resOfnone" v-show="!checkHasdata && checkSearchNull">
@@ -155,7 +155,7 @@
                 </div>
             </div>
         </div>       
-        <dialogpop v-if="isShowthis" :con-type="dialogType" :con-title="dialogTitle" :con-rank="dialogRank" :dialog-sub="hasDialogsub" :upload-array="uploadCombinelList" @dialogclose="closeEvent" @uploadeventsure="toUploadEvent"><p>{{dialogHtml}}</p><p v-if="hasDialogsub">{{dialogHtmlSub}}</p></dialogpop>
+        <use-dialog v-if="isShowthis" :con-type="dialogType" :con-title="dialogTitle" :con-rank="dialogRank" :dialog-sub="hasDialogsub" :upload-array="uploadCombinelList" @dialogclose="closeEvent" @uploadeventsure="toUploadEvent"><p>{{dialogHtml}}</p><p v-if="hasDialogsub">{{dialogHtmlSub}}</p></use-dialog>
     </div>
 </body>
 </html>

@@ -14,10 +14,10 @@ Vue.use(VueResource)
 new Vue({
   store, // vuex store
   components: {
-    'selector': Selector,
-    'dialogpop': Dialogpop,
-    'pagination': Pagination,
-    'headwrap': Headwrap
+    'useSelector': Selector,
+    'useDialog': Dialogpop,
+    'usePagination': Pagination,
+    'useHead': Headwrap
   },
   el: '#indexPage',
   data: {

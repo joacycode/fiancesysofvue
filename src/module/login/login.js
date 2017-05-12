@@ -10,7 +10,7 @@ Vue.use(VueResource)
 new Vue({
   el: '#loginPage',
   components: {
-    'headwrap': Headwrap
+    'useHead': Headwrap
   },
   data: {
     canlogin: true,

@@ -7,11 +7,12 @@
   </div>
 </template>
 <script>
-// import $ from 'jquery'
-const yearData = [{id: 2017, name: '2017年'}, {id: 2018, name: '2018年'}, {id: 2019, name: '2019年'}]
-const monthData = [{id: '01', name: '1月'}, {id: '02', name: '2月'}, {id: '03', name: '3月'}, {id: '04', name: '4月'}, {id: '05', name: '5月'}, {id: '06', name: '6月'}, {id: '07', name: '7月'}, {id: '08', name: '8月'}, {id: '09', name: '9月'}, {id: '10', name: '10月'}, {id: '11', name: '11月'}, {id: '12', name: '12月'}]
-const statuData = [{id: -2, name: '全部'}, {id: 2, name: '对账通过'}, {id: 3, name: '对账不通过'}, {id: 0, name: '未对账'}, {id: 4, name: '已确认'}]
-const verifyData = [{id: '-2', name: '核对结果'}, {id: 0, name: '不一致'}, {id: 1, name: '一致'}]
+const typeJson = {
+  yearData: [{id: 2017, name: '2017年'}, {id: 2018, name: '2018年'}, {id: 2019, name: '2019年'}],
+  monthData: [{id: '01', name: '1月'}, {id: '02', name: '2月'}, {id: '03', name: '3月'}, {id: '04', name: '4月'}, {id: '05', name: '5月'}, {id: '06', name: '6月'}, {id: '07', name: '7月'}, {id: '08', name: '8月'}, {id: '09', name: '9月'}, {id: '10', name: '10月'}, {id: '11', name: '11月'}, {id: '12', name: '12月'}],
+  statuData: [{id: -2, name: '全部'}, {id: 2, name: '对账通过'}, {id: 3, name: '对账不通过'}, {id: 0, name: '未对账'}, {id: 4, name: '已确认'}],
+  verifyData: [{id: '-2', name: '核对结果'}, {id: 0, name: '不一致'}, {id: 1, name: '一致'}]
+}
 export default {
   data () {
     return {
@@ -36,13 +37,13 @@ export default {
     selectList: function () {
       switch (this.selectType) {
         case 'year':
-          return yearData
+          return typeJson.yearData
         case 'month':
-          return monthData
+          return typeJson.monthData
         case 'status':
-          return statuData
+          return typeJson.statuData
         case 'verify':
-          return verifyData
+          return typeJson.verifyData
         case 'channel':
           return this.channels
         default:
@@ -98,41 +99,19 @@ export default {
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style lang="less">
+<style lang="less" scoped>
 // selectPicker
-.selectPicker{
-  background: #fff;border:1px solid #ddd;border-radius: 2px;position: relative;cursor: default;height: 28px;line-height: 28px;display: inline-block;float: left;
-  .defaultVal{width: 100%;height: 100%;display: block;text-align: left;overflow: hidden;white-space: nowrap;padding: 0 30px 0 10px;position: relative;color: #666;
-     &:after{
-      content: '';
-      position: absolute;
-      right: 10px;
-      top: 50%;
-      width: 0;
-      height: 0;
-      margin-top: -2.5px;
-      border-width: 5px;
-      border-color: #666 transparent transparent transparent;
-      border-style: solid;     
+.selectPicker{line-height:28px;position:relative;display:inline-block;float:left;height:28px;cursor:default;border:1px solid #ddd;border-radius:2px;background:#fff;
+  .defaultVal{position:relative;display:block;overflow:hidden;width:100%;height:100%;padding:0 30px 0 10px;text-align:left;white-space:nowrap;color:#666;
+    &:after{position:absolute;top:50%;right:10px;width:0;height:0;margin-top:-2.5px;content:'';border-width:5px;border-style:solid;border-color:#666 transparent transparent transparent;}
+  }
+  ul{position:absolute;z-index:2;top:28px;left:0;overflow-x:hidden;overflow-y:auto;min-width:100%;max-height:280px;padding:10px 0;list-style:none;white-space:nowrap;background:#fff;box-shadow:0 0 5px 0 rgba(184,191,197,.50);
+    li{line-height:24px;float:none;padding:0 10px;text-align:left;color:#666;
+      &:hover{background:#f4f8fa;}
     }
   }
-  ul{
-      min-width: 100%;max-height: 280px;list-style: none;position: absolute;top: 28px;left:0;background: #fff;padding:10px 0;box-shadow: 0 0 5px 0 rgba(184,191,197,0.50);z-index: 2;overflow-y: auto;overflow-x: hidden;white-space: nowrap;
-    li{
-      text-align: left;padding:0 10px;float: none;line-height: 24px;color: #666;
-      &:hover{
-        background: #f4f8fa;
-      }
-    }
-  }
-  &.selectStya{
-    width:100px;
-  }
-  &.selectStyb{
-    width:210px;
-  }
-  &.selectStyc{
-    width:150px;
-  }
+  &.selectStya{width:100px;}
+  &.selectStyb{width:210px;}
+  &.selectStyc{width:150px;}
 }
 </style>

@@ -48,49 +48,31 @@ export default {
   }
 }
 </script>
-<style lang="less">
+<style lang="less" scoped>
 // head
-.header{width: 100%;overflow: hidden;}
-.head-top{
-	width: 100%;height: 30px;background: #343F52;overflow: hidden;
-	.lg-info{
-		width: 1200px;margin: 0 auto;color: #fff;overflow: hidden;height: 100%;line-height: 30px;
-		span{float: right;font-size: 12px;b{margin-left: 10px;}}
-		span:first-child{margin-left: 20px;cursor: pointer;}
-	 }
+.header{overflow:hidden;width:100%;}
+.head-top{overflow:hidden;width:100%;height:30px;background:#343f52;
+  .lg-info{line-height:30px;overflow:hidden;width:1200px;height:100%;margin:0 auto;color:#fff;
+    span:first-child{margin-left:20px;cursor:pointer;}
+    span{font-size:12px;float:right;
+      b{margin-left:10px;}
+    }
+  }
 }
-.head-bot{
-	width: 100%;background: #fff;overflow: hidden;
-	ul{
-		width: 1200px;height: 60px;margin: 0 auto;
-		li{float: left;height: 100%;line-height: 60px;}
-	}
-	li.yklogo{
-		width: 130px;padding-right: 30px;position: relative;box-sizing: content-box;
-		span{width: 130px;height: 25px;display: inline-block;background-image: url(../assets/img/yk-logo.png);background-repeat: no-repeat;vertical-align: middle;}
-		&:after{
-			content: '';display: inline-block;
-			width: 1px;height: 20px;background: #D8D8D8;
-			position: absolute;right: 15px;top: 50%;margin-top: -10px;
-		}
-	}
-	li.tit{
-		font-size: 20px;color: #666;display: inline-block;
-	}
+.head-bot{overflow:hidden;width:100%;background:#fff;
+  ul{width:1200px;height:60px;margin:0 auto;
+    li{line-height:60px;float:left;height:100%;}
+  }
+  li.yklogo{position:relative;box-sizing:content-box;width:130px;padding-right:30px;
+    span{display:inline-block;width:130px;height:25px;vertical-align:middle;background-image:url(../assets/img/yk-logo.png);background-repeat:no-repeat;}
+    &:after{position:absolute;top:50%;right:15px;display:inline-block;width:1px;height:20px;margin-top:-10px;content:'';background:#d8d8d8;}
+  }
+  li.tit{font-size:20px;display:inline-block;color:#666;}
 }
-#uploadfile{
-	float: right;
-	span{
-		width: 120px;height: 35px;line-height: 35px;color: #30A4FF;border: 1px solid #30A4FF;border-radius: 2px;text-indent: 46px;display: inline-block;cursor: pointer;position: relative;
-		&:before{
-			width: 20px;height: 20px;background-image: url(../assets/img/collect.png);background-repeat: no-repeat;background-position: -80px -1px;display: inline-block;
-			content: '';
-			position: absolute;
-			top: 50%;
-			left: 10px;
-			margin-top: -10px;
-		}
-	}
+#uploadfile{float:right;
+  span{line-height:35px;position:relative;display:inline-block;width:120px;height:35px;cursor:pointer;text-indent:46px;color:#30a4ff;border:1px solid #30a4ff;border-radius:2px;
+    &:before{position:absolute;top:50%;left:10px;display:inline-block;width:20px;height:20px;margin-top:-10px;content:'';background-image:url(../assets/img/collect.png);background-repeat:no-repeat;background-position:-80px -1px;}
+  }
 }
 </style>
 

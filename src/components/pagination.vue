@@ -84,77 +84,25 @@
   }
 </script>
 <style lang="less" scoped>
-  .blankError {
-      border-color: #ff5e5e!important;
-      box-shadow: 0 0 5px 0px #ff5e5e!important;
+.blankError{border-color:#ff5e5e!important;box-shadow:0 0 5px 0 #ff5e5e!important;}
+.page-wrap{font-size:12px;margin-top:20px;text-align:right;
+  & > ul{display:inline-block;overflow:hidden;list-style:none;vertical-align:middle;
+    li{float:left;margin:0 5px;padding:6px 11px;user-select:none;color:#666;border:1px solid #ddd;border-radius:2px;}
+    a{color:#999;}
   }
-  .page-wrap {
-    text-align: right;
-    font-size: 12px;
-    margin-top: 20px;
-    & > ul {
-      display: inline-block;
-      vertical-align: middle;
-      list-style: none;
-      overflow: hidden;
-      li {
-        float: left;
-        color: #666;
-        padding: 6px 11px;
-        margin: 0 5px;
-        border-radius: 2px;
-        user-select: none;
-        border: 1px solid #ddd;
-      }
-      a{color: #999;}
-    }
-    .pointer {
-      cursor: pointer;
-    }
-    .hover {
-      &:hover {
-        a{color: #30A4FF;}
-      }
-    }
-    .li-page {
-      line-height: 1.5;
-      cursor: pointer;
-      color: #999;
-      border-radius: 2px;
-      padding: 6px 11px;
-      border: 1px solid #ddd;
-      &:hover {
-        color: #30A4FF;
-      }
-    }
-    .active {
-      background: #30A4FF;border-color: #30A4FF;
-      a{color: #fff;}
-    }
-    .skipTo{
-      display: inline-block;
-      vertical-align: middle;
-      margin-left: 20px;
-      color: #999;
-      input[type="text"]{
-        width: 50px;
-        height: 28px;
-        line-height: 28px;
-        padding: 10px;
-        margin: 0 10px;
-        border: 1px solid #ddd;
-      }
-      span{
-        background: #FAFAFA;
-        border: 1px solid #DDDDDD;
-        border-radius: 2px;
-        width: 32px;
-        height: 28px;
-        display: inline-block;
-        text-align: center;
-        line-height: 28px;
-        cursor: pointer;
-      }
+  .pointer{cursor:pointer;}
+  .hover{&:hover{a{color:#30a4ff;}
     }
   }
+  .li-page{line-height:1.5;padding:6px 11px;cursor:pointer;color:#999;border:1px solid #ddd;border-radius:2px;
+    &:hover{color:#30a4ff;}
+  }
+  .active{border-color:#30a4ff;background:#30a4ff;
+    a{color:#fff;}
+  }
+  .skipTo{display:inline-block;margin-left:20px;vertical-align:middle;color:#999;
+    input[type='text']{line-height:28px;width:50px;height:28px;margin:0 10px;padding:10px;border:1px solid #ddd;}
+    span{line-height:28px;display:inline-block;width:32px;height:28px;cursor:pointer;text-align:center;border:1px solid #ddd;border-radius:2px;background:#fafafa;}
+  }
+}
 </style>
