@@ -104,7 +104,7 @@ new Vue({
           vm.dialogHtml = response.body.message || '手动确认有误'
         }
       }, (errResponse) => {
-        this.isloading = false
+        vm.isloading = false
         console.log(errResponse)
       })
     },
@@ -139,7 +139,7 @@ new Vue({
         _params: {jsonp: 'jsoncallback'},
         callbackFun (res) {
           if (res.code === 0) {
-            console.log('对账数据统计', res.data, res.data.refund, res.data.fee)
+            // console.log('对账数据统计', res.data, res.data.refund, res.data.fee)
             vm.detialRevenue = res.data.revenue
             vm.detialRefund = res.data.refund
             vm.detialFee = res.data.fee
@@ -163,15 +163,17 @@ new Vue({
             vm.unCheckedList = []
             vm.uncheckTotal = 0
           } else { // 无法获取信息提示
-            if (this.canShowLoading) {
-              this.isloading = false
+            if (vm.canShowLoading) {
+              vm.isloading = false
               vm.isShowthis = true
               vm.dialogType = 'dialogbar'
               vm.dialogRank = 'notice'
               vm.dialogHtml = res.message || '查询有误'
             }
           }
-          if (this.canShowLoading) { this.isloading = false }
+          if (vm.canShowLoading) {
+            vm.isloading = false
+          }
         }
       })
     },
@@ -181,7 +183,7 @@ new Vue({
         _params: {jsonp: 'jsoncallback'},
         callbackFun (res) {
           if (res.code === 0) {
-            console.log('未核对统计', res, res.data.refund, res.data.fee)
+            // console.log('未核对统计', res, res.data.refund, res.data.fee)
             vm.uncheckedRevenue = res.data.revenue
             vm.uncheckedRefund = res.data.refund
             vm.uncheckedFee = res.data.fee
@@ -194,7 +196,7 @@ new Vue({
         // console.log(response.body.data)
         paramsObj.callbackFun(response.body)
       }, (errResponse) => {
-        this.isloading = false
+        vm.isloading = false
         console.log(errResponse)
       })
     },

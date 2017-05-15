@@ -192,7 +192,7 @@ export default {
           } else if (n === 3) {
             this.combinelist = this.uploadArray[3]
           }
-          console.log(this.combinelist)
+          // console.log(this.combinelist)
           break
         default: return
       }
